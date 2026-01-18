@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@import '@skeletonlabs/skeleton';
+@import '@skeletonlabs/skeleton-svelte';
+
+@theme {
+    --color-primary: var(--color-teal-500);
+    --color-secondary: var(--color-teal-800);
+    --color-bg: var(--color-surface-100);
+    --color-fg: var(--color-surface-950);
+    --color-gray1: var(--color-surface-200);
+    --color-gray2: var(--color-surface-300);
+    --color-error: var(--color-red-600);
+}
+
+[data-theme="dark"] {
+    --color-primary: var(--color-teal-500);
+    --color-secondary: var(--color-teal-200);
+    --color-bg: var(--color-surface-950);
+    --color-fg: var(--color-surface-100);
+    --color-gray1: var(--color-surface-800);
+    --color-gray2: var(--color-surface-700);
+    --color-error: var(--color-red-600);
+}
+
+body {
+    @apply bg-bg text-fg;
+    transition:
+			background-color 0.25s ease-in-out,
+			color 0.25s ease-in-out;
+}
+
+@utility abs-y-center {
+	top: 50%;
+	@apply -translate-y-1/2;
+}
+
+@utility abs-x-center {
+	left: 50%;
+	@apply -translate-x-1/2;
+}
+
+@utility abs-center {
+	@apply abs-x-center abs-y-center;
+}
