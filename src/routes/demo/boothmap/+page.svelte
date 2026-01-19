@@ -55,6 +55,23 @@
 			uploadImgDimensions[0]?.h === uploadImgDimensions[1]?.h;
 	}
 
+	async function uploadGenericMapImage() {
+		if (!imgGenericFile) {
+			return;
+		}
+
+		const formData = new FormData();
+		formData.append('file', imgGenericFile);
+
+		const res = await fetch('/map/process', {
+			method: 'POST',
+			body: formData
+		});
+
+		const data = await res.json();
+		console.log(data);
+	}
+
 	$effect(() => {
 		compareImages();
 	});
@@ -131,5 +148,10 @@
 		<p class="text-error">
 			Warning: Uploaded images have different dimensions. Proceed with caution.
 		</p>
+	{/if}
+
+	<!-- Process Button -->
+	{#if imgGenericFile !== null && imgDisplayFile !== null}
+		<button class="bg-primary" onclick={uploadGenericMapImage}>Process Map</button>
 	{/if}
 </div>

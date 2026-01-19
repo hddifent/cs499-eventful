@@ -28,9 +28,10 @@
 		if (!file) {
 			return;
 		}
+		uploadedFile = file;
+
 		if (imgPreviewURL) {
 			URL.revokeObjectURL(imgPreviewURL);
-			uploadedFile = file;
 		}
 		imgPreviewURL = URL.createObjectURL(file);
 	};

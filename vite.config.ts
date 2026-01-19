@@ -9,5 +9,14 @@ export default defineConfig({
         tailwindcss(),
         sveltekit(),
         Icons({ compiler: 'svelte' })
-    ]
+    ],
+
+    server: {
+        proxy: {
+            '/map': {
+                target: 'http://localhost:8000'
+            }
+        }
+    }
+
 });
