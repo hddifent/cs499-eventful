@@ -64,13 +64,13 @@
 
 		<!-- Events Display -->
 		<GridDisplay>
-			<CardSquare imgSrc="" title="Event 1" />
-			<CardSquare imgSrc="https://github.com/hddifent.png" title="Event 2" />
-			<CardSquare imgSrc="" title="Event 3" />
-			<CardSquare imgSrc="" title="Event 4" />
-			<CardSquare imgSrc="" title="Event 5" />
-			<CardSquare imgSrc="" title="Event 6" />
-			<CardSquare imgSrc="https://github.com/anuken.png" title="Event 7" />
+			<CardSquare data={[{ text: 'Event 1', importance: 'title' }]} />
+			<CardSquare data={[{ text: 'Event 2', importance: 'title' }]} />
+			<CardSquare data={[{ text: 'Event 3', importance: 'title' }]} />
+			<CardSquare data={[{ text: 'Event 4', importance: 'title' }]} />
+			<CardSquare data={[{ text: 'Event 5', importance: 'title' }]} />
+			<CardSquare data={[{ text: 'Event 6', importance: 'title' }]} />
+			<CardSquare data={[{ text: 'Event 7', importance: 'title' }]} />
 		</GridDisplay>
 	</div>
 </div>
