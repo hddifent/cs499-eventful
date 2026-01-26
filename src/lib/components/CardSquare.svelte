@@ -6,9 +6,9 @@
 	type DataImportance = 'title' | 'subtitle' | 'description';
 
 	const textClass: Record<DataImportance, string> = {
-		title: 'font-black text-lg',
-		subtitle: 'text-secondary',
-		description: 'text-fg/80'
+		title: 'font-black',
+		subtitle: 'text-secondary text-sm',
+		description: 'text-fg/80 text-sm'
 	};
 
 	interface DisplayData {
@@ -43,7 +43,7 @@
 	<!-- Descriptions -->
 	<div class="h-fit overflow-clip rounded-b-lg bg-gray1 px-4 py-2 text-ellipsis shadow-md">
 		{#each data as d}
-			<span class={textClass[d.importance]}>{d.text}</span>
+			<div class={textClass[d.importance]}>{d.text}</div>
 		{/each}
 	</div>
 {/snippet}

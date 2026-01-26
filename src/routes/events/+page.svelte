@@ -64,7 +64,13 @@
 
 		<!-- Events Display -->
 		<GridDisplay>
-			<CardSquare data={[{ text: 'Event 1', importance: 'title' }]} />
+			<CardSquare
+				data={[
+					{ text: 'Comic Square 10', importance: 'title' },
+					{ text: 'Mar 3, 2026', importance: 'subtitle' },
+					{ text: 'Comic Square is back!', importance: 'description' }
+				]}
+			/>
 			<CardSquare data={[{ text: 'Event 2', importance: 'title' }]} />
 			<CardSquare data={[{ text: 'Event 3', importance: 'title' }]} />
 			<CardSquare data={[{ text: 'Event 4', importance: 'title' }]} />
