@@ -13,7 +13,7 @@ export default defineConfig({
 
     server: {
         proxy: {
-            '/map': {
+            '/api': {
                 target: 'http://localhost:8000'
             }
         }

@@ -3,7 +3,7 @@ import type { RequestHandler } from "@sveltejs/kit";
 export const POST: RequestHandler = async ({ request, fetch }) => {
     const formData = await request.formData();
 
-    const res = await fetch('/map/process', {
+    const res = await fetch('/api/map/process', {
         method: 'POST',
         body: formData
     });
