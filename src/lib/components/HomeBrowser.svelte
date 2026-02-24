@@ -41,37 +41,36 @@
 		<div class="mx-auto w-10/12">
 			<GridDisplay>
 				{#if id === 'Recomended'}
-					<CardSquare imgSrc="" title="Recomended 1" />
-					<CardSquare imgSrc="" title="Recomended 2" />
-					<CardSquare imgSrc="" title="Recomended 3" />
-					<CardSquare imgSrc="https://github.com/hddifent.png" title="Recomended 4" />
-					<CardSquare imgSrc="" title="Recomended 5" />
-					<CardSquare imgSrc="https://github.com/anuken.png" title="Recomended 6" />
-					<CardSquare imgSrc="" title="Recomended 7" />
+					<CardSquare data={[{ text: 'Recomended 1', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Recomended 2', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Recomended 3', importance: 'title' }]} />
+					<CardSquare
+						imgSrc="https://github.com/hddifent.png"
+						data={[{ text: 'Recomended 4', importance: 'title' }]}
+					/>
+					<CardSquare data={[{ text: 'Recomended 5', importance: 'title' }]} />
+					<CardSquare
+						imgSrc="https://github.com/anuken.png"
+						data={[{ text: 'Recomended 6', importance: 'title' }]}
+					/>
+					<CardSquare data={[{ text: 'Recomended 7', importance: 'title' }]} />
 				{:else if id === 'Upcoming'}
-					<CardSquare imgSrc="" title="Upcoming 1" />
-					<CardSquare imgSrc="" title="Upcoming 2" />
-					<CardSquare imgSrc="https://github.com/saacsos.png" title="Upcoming 3" />
-					<CardSquare imgSrc="" title="Upcoming 4" />
-					<CardSquare imgSrc="" title="Upcoming 5" />
-					<CardSquare imgSrc="" title="Upcoming 6" />
-					<CardSquare imgSrc="" title="Upcoming 7" />
-					<CardSquare imgSrc="" title="Upcoming 8" />
-					<CardSquare imgSrc="" title="Upcoming 9" />
-					<CardSquare imgSrc="" title="Upcoming 10" />
-					<CardSquare imgSrc="" title="Upcoming 11" />
-					<CardSquare imgSrc="" title="Upcoming 12" />
-					<CardSquare imgSrc="" title="Upcoming 13" />
-					<CardSquare imgSrc="" title="Upcoming 14" />
-					<CardSquare imgSrc="" title="Upcoming 15" />
-					<CardSquare imgSrc="" title="Upcoming 16" />
-					<CardSquare imgSrc="" title="Upcoming 17" />
-					<CardSquare imgSrc="" title="Upcoming 18" />
-					<CardSquare imgSrc="" title="Upcoming 19" />
+					<CardSquare data={[{ text: 'Upcoming 1', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Upcoming 2', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Upcoming 3', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Upcoming 4', importance: 'title' }]} />
 				{:else if id === 'Apply for Booth'}
-					<CardSquare imgSrc="" title="Apply for Booth 1" />
-					<CardSquare imgSrc="https://github.com/omise.png" title="Apply for Booth 2" />
-					<CardSquare imgSrc="" title="Apply for Booth 3" />
+					<CardSquare data={[{ text: 'Apply for Booth 1', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Apply for Booth 2', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Apply for Booth 3', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Apply for Booth 4', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Apply for Booth 5', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Apply for Booth 6', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Apply for Booth 7', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Apply for Booth 8', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Apply for Booth 9', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Apply for Booth 10', importance: 'title' }]} />
+					<CardSquare data={[{ text: 'Apply for Booth 11', importance: 'title' }]} />
 				{:else}
 					<span>Something went wrong... Terribly wrong...</span>
 				{/if}
