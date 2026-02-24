@@ -5,16 +5,12 @@
 
 	import ImageUpload from '$lib/components/ImageUpload.svelte';
 
+	import { BoothMapUploader } from '$lib/BoothMapUploader.svelte';
+
 	interface imgDimensions {
 		w: number;
 		h: number;
 	}
-
-	type BoothBoundingBox = {
-		[key: string]: {
-			bounding_box: [[number, number], [number, number]];
-		};
-	};
 
 	const maxFileSize = 5 * 1024 * 1024;
 	let imgGenericPreviewURL: string | null = $state(null);
@@ -22,9 +18,8 @@
 	let imgGenericFile: File | null = $state(null);
 	let imgDisplayFile: File | null = $state(null);
 
-	let processingMap: boolean = $state(false);
-	let displayReady: boolean = $state(false);
-	let processedMapData: BoothBoundingBox | null = $state(null);
+	let boothMapUploader: BoothMapUploader = new BoothMapUploader();
+
 	let displayCanvasElement: HTMLCanvasElement | null = $state(null);
 	let displayBoothImageElement: HTMLImageElement | null = $state(null);
 
@@ -52,9 +47,6 @@
 	}
 
 	async function compareImages() {
-		// Move this somewhere else...
-		displayReady = false;
-
 		uploadImgDimensions = await Promise.all([
 			imgGenericPreviewURL ? getImgDimensions(imgGenericPreviewURL) : Promise.resolve(null),
 			imgDisplayPreviewURL ? getImgDimensions(imgDisplayPreviewURL) : Promise.resolve(null)
@@ -70,33 +62,9 @@
 			uploadImgDimensions[0]?.h === uploadImgDimensions[1]?.h;
 	}
 
-	async function uploadGenericMapImage() {
-		if (!imgGenericFile) {
-			return;
-		}
-
-		console.log('Request Sent');
-		processingMap = true;
-		displayReady = false;
-
-		const formData = new FormData();
-		formData.append('file', imgGenericFile);
-
-		const res = await fetch('/api/map/process', {
-			method: 'POST',
-			body: formData
-		});
-
-		const data = await res.json();
-		processedMapData = data;
-		console.log($state.snapshot(processedMapData));
-
-		processingMap = false;
-	}
-
 	const drawBoothBoxes = () => {
 		if (
-			!processedMapData ||
+			!boothMapUploader.processedMapData ||
 			!displayCanvasElement ||
 			!displayBoothImageElement ||
 			!imgDisplayPreviewURL
@@ -124,7 +92,7 @@
 		ctx.font = '12px sans-serif';
 		ctx.fillStyle = 'rgba(0, 255, 0, 0.9)';
 
-		for (const [label, data] of Object.entries(processedMapData)) {
+		for (const [label, data] of Object.entries(boothMapUploader.processedMapData)) {
 			const [[x1, y1], [x2, y2]] = data.bounding_box;
 
 			const x = x1 * scalingX;
@@ -135,8 +103,6 @@
 			ctx.strokeRect(x, y, w, h);
 			ctx.fillText(label, x + 4, y + 14);
 		}
-
-		displayReady = true;
 	};
 
 	$effect(() => {
@@ -222,15 +188,21 @@
 		{#if imgGenericFile !== null && imgDisplayFile !== null}
 			<button
 				class="rounded-lg bg-primary px-4 py-2 text-bg shadow-md"
-				onclick={uploadGenericMapImage}
-				disabled={processingMap}
+				onclick={boothMapUploader.processImage}
+				disabled={boothMapUploader.isProcessing}
 			>
 				Process Map
 			</button>
 		{/if}
 
+		{#if boothMapUploader.uploadError}
+			<p class="text-error">
+				{boothMapUploader.uploadError}
+			</p>
+		{/if}
+
 		<!-- TODO: Make this refreshes every time the image is resized. -->
-		{#if !processingMap && processedMapData}
+		{#if !boothMapUploader.isProcessing && boothMapUploader.processedMapData}
 			<div class="relative inline-block">
 				<img
 					bind:this={displayBoothImageElement}
