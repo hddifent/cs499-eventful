@@ -12,6 +12,11 @@
 
 	import { Dialog } from 'melt/builders';
 
+	import type { PageProps } from './$types';
+
+	// Loaded data from API
+	const { data }: PageProps = $props();
+
 	// Dialog Setups
 	const filterDialog = new Dialog({ closeOnOutsideClick: false });
 
@@ -64,19 +69,14 @@
 
 		<!-- Events Display -->
 		<GridDisplay>
-			<CardSquare
-				data={[
-					{ text: 'Comic Square 10', importance: 'title' },
-					{ text: 'Mar 3, 2026', importance: 'subtitle' },
-					{ text: 'Comic Square is back!', importance: 'description' }
-				]}
-			/>
-			<CardSquare data={[{ text: 'Event 2', importance: 'title' }]} />
-			<CardSquare data={[{ text: 'Event 3', importance: 'title' }]} />
-			<CardSquare data={[{ text: 'Event 4', importance: 'title' }]} />
-			<CardSquare data={[{ text: 'Event 5', importance: 'title' }]} />
-			<CardSquare data={[{ text: 'Event 6', importance: 'title' }]} />
-			<CardSquare data={[{ text: 'Event 7', importance: 'title' }]} />
+			{#each data.events as event}
+				<CardSquare
+					data={[
+						{ text: event.title, importance: 'title' },
+						{ text: event.description, importance: 'description' }
+					]}
+				/>
+			{/each}
 		</GridDisplay>
 	</div>
 </div>
