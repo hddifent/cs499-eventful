@@ -6,6 +6,7 @@
 @import '@skeletonlabs/skeleton-svelte';
 
 @theme {
+    --color-primary-hover: var(--color-teal-400);
     --color-primary: var(--color-teal-500);
     --color-secondary: var(--color-teal-800);
     --color-bg: var(--color-surface-100);
@@ -16,6 +17,7 @@
 }
 
 [data-theme="dark"] {
+    --color-primary-hover: var(--color-teal-600);
     --color-primary: var(--color-teal-500);
     --color-secondary: var(--color-teal-300);
     --color-bg: var(--color-surface-950);
@@ -30,6 +32,10 @@ body {
     transition:
 			background-color 0.25s ease-in-out,
 			color 0.25s ease-in-out;
+}
+
+button, a {
+	transition: all 0.1s ease-in-out;
 }
 
 @utility abs-y-center {
