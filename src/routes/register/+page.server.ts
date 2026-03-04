@@ -1,8 +1,76 @@
+import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
+import { z } from 'zod'
+
+const registerSchema = z.object({
+    email: z.email({ message: "Invalid email address." }),
+
+    username: z.string()
+        .min(1, { message: "Username cannot be empty." })
+        .max(32, { message: "Username must not exceed 32 characters." })
+        .regex(/^[a-zA-Z]/, { message: "Username must start with a letter." })
+        .regex(/^(?!.*[_.]{2})/, { message: "Username cannot have consecutive underscores or periods." })
+        .regex(/^[a-zA-Z0-9_.]+$/, { message: "Username can only contain letters, numbers, underscores, or periods." }),
+
+    displayName: z.string()
+        .min(1, { message: "Display name cannot be empty." })
+        .max(100, { message: "Display name must not exceed 100 characters." })
+        .trim()
+        .regex(/^[a-zA-Z0-9_. -]+$/, { message: "Display name contains invalid characters." }),
+
+    password: z.string()
+        .min(8, { message: "Password must be at least 8 characters." })
+        .max(64, { message: "Password must not exceed 64 characters." }),
+
+    confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"]
+});
 
 export const actions = {
-    default: async ({ request }) => {
+    default: async ({ request, fetch }) => {
         const formData = await request.formData();
-        console.log(`Logging in: ${formData.get("username")}`)
+
+        const validationResult = registerSchema.safeParse(Object.fromEntries(formData));
+        if (!validationResult.success) {
+            const fieldErrors = z.treeifyError(validationResult.error)
+            return fail(400, {
+                message: fieldErrors.errors,
+                data: formData
+            });
+        }
+
+        const { email, username, displayName, password } = validationResult.data;
+        const reqPayload = {
+            user_email: email,
+            username: username,
+            user_display_name: displayName,
+            user_pwd: password
+        }
+
+        try {
+            const res = await fetch('/api/users/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reqPayload)
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                return fail(res.status, {
+                    message: errorData.detail || 'Registration failed. Please try again.',
+                    data: { email, username, displayName }
+                });
+            }
+        } catch (err) {
+            console.error('Register error:', err);
+            return fail(500, {
+                message: 'Could not connect to the server.',
+                data: { email, username, displayName }
+            });
+        }
+
+        throw redirect(303, '/login');
     }
 } satisfies Actions;

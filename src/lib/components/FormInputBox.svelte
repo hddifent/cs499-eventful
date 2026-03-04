@@ -7,16 +7,9 @@
 		inputLabel: Snippet;
 		type: HTMLInputTypeAttribute;
 		autocomplete?: FullAutoFill;
-		required?: boolean;
 	}
 
-	let {
-		name,
-		inputLabel,
-		type,
-		autocomplete = 'off',
-		required = true
-	}: FormInputBoxData = $props();
+	let { name, inputLabel, type, autocomplete = 'off' }: FormInputBoxData = $props();
 </script>
 
 <label>
@@ -24,7 +17,6 @@
 		{name}
 		{type}
 		{autocomplete}
-		{required}
 		class="rounded-lg border-0 bg-bg px-4 shadow-md ring-0 outline-none focus:ring-0"
 	/>
 	<span class="flex items-center gap-2 rounded-lg">
