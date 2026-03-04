@@ -28,17 +28,42 @@ const registerSchema = z.object({
     path: ["confirmPassword"]
 });
 
+interface RegistrationReturnBody {
+    validationError?: {
+        fieldErrors: {
+            email?: string[],
+            username?: string[],
+            displayName?: string[],
+            password?: string[],
+            confirmPassword?: string[]
+        }
+        formErrors: string[]
+    },
+    message: string,
+    data: {
+        email?: string,
+        username?: string,
+        displayName?: string
+    }
+}
+
 export const actions = {
     default: async ({ request, fetch }) => {
-        const formData = await request.formData();
+        const formData = Object.fromEntries(await request.formData());
 
-        const validationResult = registerSchema.safeParse(Object.fromEntries(formData));
+        const validationResult = registerSchema.safeParse(formData);
         if (!validationResult.success) {
-            const fieldErrors = z.treeifyError(validationResult.error)
-            return fail(400, {
-                message: fieldErrors.errors,
-                data: formData
-            });
+            const fieldErrors = z.flattenError(validationResult.error)
+            const body: RegistrationReturnBody = {
+                validationError: fieldErrors,
+                message: "Form validation error",
+                data: {
+                    email: formData.email as string,
+                    username: formData.username as string,
+                    displayName: formData.displayName as string,
+                }
+            }
+            return fail(400, body);
         }
 
         const { email, username, displayName, password } = validationResult.data;
@@ -58,17 +83,20 @@ export const actions = {
 
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
-                return fail(res.status, {
+                const body: RegistrationReturnBody = {
                     message: errorData.detail || 'Registration failed. Please try again.',
                     data: { email, username, displayName }
-                });
+                }
+                return fail(res.status, body);
             }
-        } catch (err) {
+        }
+        catch (err) {
             console.error('Register error:', err);
-            return fail(500, {
+            const body: RegistrationReturnBody = {
                 message: 'Could not connect to the server.',
                 data: { email, username, displayName }
-            });
+            }
+            return fail(500, body);
         }
 
         throw redirect(303, '/login');
