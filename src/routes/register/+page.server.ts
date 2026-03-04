@@ -38,13 +38,13 @@ interface RegistrationReturnBody {
             confirmPassword?: string[]
         }
         formErrors: string[]
-    },
-    message: string,
+    };
+    message: string;
     data: {
         email?: string,
         username?: string,
         displayName?: string
-    }
+    };
 }
 
 export const actions = {
