@@ -13,9 +13,9 @@ const registerSchema = z.object({
         .regex(/^[a-zA-Z0-9_.]+$/, { message: "Username can only contain letters, numbers, underscores, or periods." }),
 
     displayName: z.string()
+        .trim()
         .min(1, { message: "Display name cannot be empty." })
         .max(100, { message: "Display name must not exceed 100 characters." })
-        .trim()
         .regex(/^[a-zA-Z0-9_. -]+$/, { message: "Display name contains invalid characters." }),
 
     password: z.string()
