@@ -2,6 +2,8 @@
 	import { enhance } from '$app/forms';
 	import type { ActionData, SubmitFunction } from './$types';
 
+	import banner from '$lib/assets/bannner.png';
+
 	import TopCard from '$lib/components/TopCard.svelte';
 
 	import FormInputBox from '$lib/components/FormInputBox.svelte';
@@ -31,10 +33,7 @@
 	};
 </script>
 
-<TopCard
-	imgSrc="https://img5.pic.in.th/file/secure-sv1/Untitled-design9646db70f911e5d2.md.png"
-	title="Register"
-/>
+<TopCard imgSrc={banner} title="Register" />
 
 <div class="py-8">
 	<div class="mx-auto w-lg max-w-10/12 space-y-4 rounded-lg bg-gray1 p-4 shadow-md">
