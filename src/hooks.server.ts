@@ -8,7 +8,9 @@ export const handle: Handle = async ({ event, resolve }) => {
         const response = await fetch(targetUrl, {
             method: event.request.method,
             headers: event.request.headers,
-            body: event.request.body
+            body: event.request.body,
+            // @ts-expect-error - Node.js requires duplex for streaming bodies
+            duplex: "half"
         });
 
         return response;
