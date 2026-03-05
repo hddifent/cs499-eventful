@@ -47,21 +47,21 @@
 				name={'email'}
 				type={'email'}
 				inputLabel={emailLabel}
-				value={form?.data.email}
+				value={form?.data?.email}
 				errorMessage={form?.validationError?.fieldErrors.email?.[0]}
 			/>
 			<FormInputBox
 				name={'username'}
 				type={'text'}
 				inputLabel={usernameLabel}
-				value={form?.data.username}
+				value={form?.data?.username}
 				errorMessage={form?.validationError?.fieldErrors.username?.[0]}
 			/>
 			<FormInputBox
 				name={'displayName'}
 				type={'text'}
 				inputLabel={displayNameLabel}
-				value={form?.data.displayName}
+				value={form?.data?.displayName}
 				errorMessage={form?.validationError?.fieldErrors.displayName?.[0]}
 			/>
 			<FormInputBox
@@ -86,6 +86,9 @@
 				{isRegistering ? 'Please hold...' : 'Register'}
 			</button>
 		</form>
+		{#if form?.validationError?.formErrors}
+			<div class="mx-auto w-max text-error">{form.validationError.formErrors[0]}</div>
+		{/if}
 		{#if form?.message}
 			<div class="mx-auto w-max text-error">{form.message}</div>
 		{/if}

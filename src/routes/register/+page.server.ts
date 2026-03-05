@@ -40,7 +40,7 @@ interface RegistrationReturnBody {
         formErrors: string[]
     };
     message?: string;
-    data: {
+    data?: {
         email?: string,
         username?: string,
         displayName?: string
