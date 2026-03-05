@@ -7,26 +7,45 @@
 		inputLabel: Snippet;
 		type: HTMLInputTypeAttribute;
 		autocomplete?: FullAutoFill;
+		value?: string;
+		errorMessage?: string;
 	}
 
-	let { name, inputLabel, type, autocomplete = 'off' }: FormInputBoxData = $props();
+	let {
+		name,
+		inputLabel,
+		type,
+		autocomplete = 'off',
+		value = $bindable(''),
+		errorMessage
+	}: FormInputBoxData = $props();
 </script>
 
-<label>
-	<input
-		{name}
-		{type}
-		{autocomplete}
-		class="rounded-lg border-0 bg-bg px-4 shadow-md ring-0 outline-none focus:ring-0"
-	/>
-	<span class="flex items-center gap-2 rounded-lg">
-		{@render inputLabel()}
-	</span>
-</label>
+<div>
+	<label>
+		<input
+			{name}
+			{type}
+			{autocomplete}
+			bind:value
+			class="w-full rounded-lg border-2 bg-bg px-4 shadow-md ring-0 transition-colors outline-none focus:ring-0"
+			class:border-transparent={!errorMessage}
+			class:border-error={errorMessage}
+			class:filled={value.length > 0}
+		/>
+		<span class="flex items-center gap-2 rounded-lg">
+			{@render inputLabel()}
+		</span>
+	</label>
+	{#if errorMessage}
+		<span class="text-sm text-error">{errorMessage}</span>
+	{/if}
+</div>
 
 <style>
 	label {
 		position: relative;
+		display: block;
 	}
 
 	label span {
@@ -40,12 +59,8 @@
 		pointer-events: none;
 	}
 
-	label input {
-		width: 100%;
-	}
-
 	label input:focus ~ span,
-	label input:valid ~ span {
+	label input.filled ~ span {
 		transform: translate(0, -50%);
 		left: calc(var(--spacing) * 2);
 		top: 0;

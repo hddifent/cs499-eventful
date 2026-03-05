@@ -39,7 +39,7 @@ interface RegistrationReturnBody {
         }
         formErrors: string[]
     };
-    message: string;
+    message?: string;
     data: {
         email?: string,
         username?: string,
@@ -56,7 +56,6 @@ export const actions = {
             const fieldErrors = z.flattenError(validationResult.error)
             const body: RegistrationReturnBody = {
                 validationError: fieldErrors,
-                message: "Form validation error",
                 data: {
                     email: formData.email as string,
                     username: formData.username as string,
