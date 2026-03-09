@@ -3,29 +3,34 @@
 	import MdiSearch from 'virtual:icons/mdi/magnify';
 	import MdiAccount from 'virtual:icons/mdi/account';
 	import MdiList from 'virtual:icons/mdi/invoice-list';
+	import MdiLogin from 'virtual:icons/mdi/login';
+	import MdiLogout from 'virtual:icons/mdi/logout';
 
-	import { Debounced } from 'runed';
-
-	import { Avatar } from 'melt/builders';
+	import { Avatar, Popover } from 'melt/builders';
+	import { scale } from 'svelte/transition';
 
 	interface NavbarConfig {
+		isLoggedIn: boolean;
+		profilePicUrl?: string;
 		minimalInfoMode?: boolean;
 	}
 
-	let { minimalInfoMode = false }: NavbarConfig = $props();
+	let { isLoggedIn, profilePicUrl, minimalInfoMode = false }: NavbarConfig = $props();
 
-	// TODO: replace this with real logic
-	let isSignedIn = $state(false);
 	let searchQuery = $state('');
 
-	const avatar = new Avatar({ src: () => 'https://github.com/hddifent.png' });
+	const avatar = new Avatar({ src: () => profilePicUrl ?? '' });
+	const userMenu = new Popover({
+		floatingConfig: {
+			computePosition: {
+				placement: 'bottom-end',
+				strategy: 'fixed'
+			}
+		}
+	});
 
 	const handleShoppingListClick = () => {
 		console.log('SPEND!!!');
-	};
-
-	const handleAvatarClick = () => {
-		console.log('AVATAR!!!');
 	};
 </script>
 
@@ -57,15 +62,44 @@
 
 		<!-- Right -->
 		<div class="flex min-w-1/8 items-center justify-end gap-4 text-bg">
-			{#if isSignedIn}
+			{#if isLoggedIn}
 				<button onclick={handleShoppingListClick} class="py-2 text-2xl"><MdiList /></button>
-				<button class="h-10 w-10 rounded-full bg-secondary" onclick={handleAvatarClick}>
+
+				<button class="h-10 w-10 rounded-full bg-secondary" {...userMenu.trigger}>
 					<img {...avatar.image} alt="" class="h-[inherit] rounded-full object-cover" />
 					<span {...avatar.fallback}><MdiAccount class="w-full text-center text-xl" /></span>
 				</button>
+				{#if userMenu.open}
+					<div
+						{...userMenu.content}
+						class="popup-content min-w-40 space-y-2 rounded-lg bg-gray1 p-4 text-base font-normal text-fg shadow-md"
+						transition:scale={{ duration: 200, start: 0.9 }}
+					>
+						<div class="flex items-center gap-x-2"><MdiAccount /> My Profile</div>
+						<hr class="w-full border border-fg/50" />
+						<form action="/logout" method="POST">
+							<button class="flex items-center gap-x-2 text-error"><MdiLogout /> Logout</button>
+						</form>
+					</div>
+				{/if}
 			{:else}
-				<a href="/login" class="rounded-lg bg-secondary px-4 py-2"> Log In </a>
+				<a href="/login" class="flex items-center gap-x-2 rounded-lg bg-secondary px-4 py-2">
+					<MdiLogin class="text-xl" /> Log In
+				</a>
 			{/if}
 		</div>
 	{/if}
 </nav>
+
+<!-- <style>
+	.popup-content {
+		opacity: 0.5;
+		scale: 0.9;
+		transition: all 200ms ease-in-out;
+	}
+
+	.popup-content[data-open] {
+		opacity: 1;
+		scale: 1;
+	}
+</style> -->
