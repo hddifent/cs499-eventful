@@ -1,3 +1,4 @@
+import { error } from "@sveltejs/kit";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch, params }) => {
@@ -8,16 +9,17 @@ export const load: PageLoad = async ({ fetch, params }) => {
 
         if (res.ok) {
             const data = await res.json();
-            return data;
+            return {
+                events: data
+            };
         }
         else {
-            const errorText = await res.text();
-            console.error(`Fetch Error! >>> (${res.status}): ${errorText}`);
-            return {};
+            const errorData = await res.json().catch(() => ({}));
+            return error(res.status, errorData.detail || "Could not fetch events. Please try again.");
         }
     }
     catch (err) {
-        console.error("Network Error! >>> ", err)
-        return {};
+        console.error("Event fetch error:", err)
+        return error(500, "Could not connect to the server.");
     }
 }
