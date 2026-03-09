@@ -65,7 +65,7 @@ export const actions = {
             cookies.set("session_token", data.session_token, {
                 path: "/",
                 httpOnly: true,
-                sameSite: "strict",
+                sameSite: "lax",
                 secure: !dev,
                 maxAge: data.session_maxage
             })
