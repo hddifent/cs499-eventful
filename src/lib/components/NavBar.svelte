@@ -90,16 +90,3 @@
 		</div>
 	{/if}
 </nav>
-
-<!-- <style>
-	.popup-content {
-		opacity: 0.5;
-		scale: 0.9;
-		transition: all 200ms ease-in-out;
-	}
-
-	.popup-content[data-open] {
-		opacity: 1;
-		scale: 1;
-	}
-</style> -->
