@@ -5,7 +5,8 @@
 	import type { PageServerData } from './$types';
 
 	const { data }: { data: PageServerData } = $props();
-	const avatar = new Avatar({ src: () => data.pfp_url });
+
+	const avatar = new Avatar({ src: () => data.user.pfpUrl });
 </script>
 
 <div class="p-8">
@@ -20,8 +21,8 @@
 
 		<!-- Names -->
 		<div class="space-y-2">
-			<div class="text-5xl font-bold">{data.user_display_name}</div>
-			<div class="text-2xl">@{data.username}</div>
+			<div class="text-5xl font-bold">{data.user.displayName}</div>
+			<div class="text-2xl">@{data.user.username}</div>
 		</div>
 	</div>
 </div>
