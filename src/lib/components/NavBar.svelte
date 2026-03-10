@@ -75,7 +75,7 @@
 						class="popup-content min-w-40 space-y-2 rounded-lg bg-gray1 p-4 text-base font-normal text-fg shadow-md"
 						transition:scale={{ duration: 200, start: 0.9 }}
 					>
-						<div class="flex items-center gap-x-2"><MdiAccount /> My Profile</div>
+						<a href="/account" class="flex items-center gap-x-2"><MdiAccount /> My Profile</a>
 						<hr class="w-full border border-fg/50" />
 						<form action="/logout" method="POST">
 							<button class="flex items-center gap-x-2 text-error"><MdiLogout /> Logout</button>
