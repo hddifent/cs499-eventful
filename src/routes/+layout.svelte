@@ -4,10 +4,16 @@
 	import '@fontsource/google-sans';
 
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 
 	import NavBar from '$lib/components/NavBar.svelte';
+	import type { LayoutProps } from './$types';
 
-	let { children } = $props();
+	let { data, children }: LayoutProps = $props();
+
+	let isNavBarMinimal = $derived(
+		page.url.pathname === '/login' || page.url.pathname === '/register'
+	);
 
 	const themes = ['light', 'dark'];
 	let themeIndex = 0;
@@ -38,7 +44,11 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
-<NavBar />
+<NavBar
+	isLoggedIn={data.isLoggedIn}
+	profilePicUrl={data.profilePicUrl}
+	minimalInfoMode={isNavBarMinimal}
+/>
 
 {@render children()}
 
