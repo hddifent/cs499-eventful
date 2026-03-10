@@ -73,29 +73,19 @@ export const actions = {
             user_pwd: password
         }
 
-        try {
-            const res = await fetch('/api/users/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(reqPayload)
-            });
+        const res = await fetch('/api/users/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reqPayload)
+        });
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                const body: RegistrationReturnBody = {
-                    message: errorData.detail || 'Registration failed. Please try again.',
-                    data: { email, username, displayName }
-                }
-                return fail(res.status, body);
-            }
-        }
-        catch (err) {
-            console.error('Register error:', err);
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
             const body: RegistrationReturnBody = {
-                message: 'Could not connect to the server.',
+                message: errorData.detail || 'Registration failed. Please try again.',
                 data: { email, username, displayName }
             }
-            return fail(500, body);
+            return fail(res.status, body);
         }
 
         throw redirect(303, '/login');

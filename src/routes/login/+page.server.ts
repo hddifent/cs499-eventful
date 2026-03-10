@@ -45,39 +45,29 @@ export const actions = {
             user_pwd: password
         }
 
-        try {
-            const res = await fetch('/api/users/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(reqPayload)
-            });
+        const res = await fetch('/api/users/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reqPayload)
+        });
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                const body: LoginReturnBody = {
-                    message: errorData.detail || 'Login failed. Please try again.',
-                    data: { username }
-                }
-                return fail(res.status, body);
-            }
-
-            const data = await res.json();
-            cookies.set("session_token", data.session_token, {
-                path: "/",
-                httpOnly: true,
-                sameSite: "lax",
-                secure: !dev,
-                maxAge: data.session_maxage
-            })
-        }
-        catch (err) {
-            console.error('Register error:', err);
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
             const body: LoginReturnBody = {
-                message: 'Could not connect to the server.',
+                message: errorData.detail || 'Login failed. Please try again.',
                 data: { username }
             }
-            return fail(500, body);
+            return fail(res.status, body);
         }
+
+        const data = await res.json();
+        cookies.set("session_token", data.session_token, {
+            path: "/",
+            httpOnly: true,
+            sameSite: "lax",
+            secure: !dev,
+            maxAge: data.session_maxage
+        })
 
         throw redirect(303, '/');
     }
