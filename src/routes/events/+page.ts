@@ -15,11 +15,11 @@ export const load: PageLoad = async ({ fetch, params }) => {
         }
         else {
             const errorData = await res.json().catch(() => ({}));
-            return error(res.status, errorData.detail || "Could not fetch events. Please try again.");
+            throw error(res.status, errorData.detail || "Could not fetch events. Please try again.");
         }
     }
     catch (err) {
         console.error("Event fetch error:", err)
-        return error(500, "Could not connect to the server.");
+        throw error(500, "Could not connect to the server.");
     }
 }

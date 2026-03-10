@@ -12,10 +12,10 @@
 
 	import { Dialog } from 'melt/builders';
 
-	import type { PageProps } from './$types';
+	import type { PageData } from './$types';
 
 	// Loaded data from API
-	const { data }: PageProps = $props();
+	const { data }: { data: PageData } = $props();
 
 	// Dialog Setups
 	const filterDialog = new Dialog({ closeOnOutsideClick: false });
@@ -147,7 +147,7 @@
 	dialog {
 		opacity: 0;
 		scale: 0.9;
-		transition: opacity 200ms ease scale 200ms ease;
+		transition: all 200ms ease-in-out;
 	}
 
 	dialog::backdrop {
@@ -159,17 +159,13 @@
 		scale: 1;
 	}
 
-	button {
-		transition: background-color 200ms ease;
-	}
-
 	[data-melt-dialog-overlay] {
 		position: fixed;
 		width: 100%;
 		height: 100%;
 		background: color-mix(in oklab, var(--color-fg) 50%, transparent);
 		opacity: 0;
-		transition: opacity 200ms ease;
+		transition: opacity 200ms ease-in-out;
 	}
 
 	[data-melt-dialog-overlay][data-open] {
