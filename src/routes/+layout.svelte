@@ -30,10 +30,10 @@
 		applyTheme();
 	});
 
-	const switchTheme = () => {
-		themeIndex += 1;
-		applyTheme();
-	};
+	// const switchTheme = () => {
+	// 	themeIndex += 1;
+	// 	applyTheme();
+	// };
 
 	function applyTheme() {
 		themeIndex %= themes.length;

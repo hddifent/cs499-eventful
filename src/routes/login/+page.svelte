@@ -7,6 +7,7 @@
 	import TopCard from '$lib/components/TopCard.svelte';
 	import FormInputBox from '$lib/components/FormInputBox.svelte';
 	import { usernameLabel, passwordLabel } from '$lib/components/FormInputLabel.svelte';
+	import { resolve } from '$app/paths';
 
 	let { form }: { form: ActionData } = $props();
 
@@ -35,15 +36,15 @@
 			novalidate
 		>
 			<FormInputBox
-				name={'username'}
-				type={'text'}
+				name="username"
+				type="text"
 				inputLabel={usernameLabel}
 				value={form?.data?.username}
 				errorMessage={form?.validationError?.fieldErrors.username?.[0]}
 			/>
 			<FormInputBox
-				name={'password'}
-				type={'password'}
+				name="password"
+				type="password"
 				inputLabel={passwordLabel}
 				bind:value={_t_pwd}
 				errorMessage={form?.validationError?.fieldErrors.password?.[0]}
@@ -64,7 +65,9 @@
 		{/if}
 		<div class="mx-auto w-max text-sm">
 			Don't have an account yet?
-			<a href="/register" class="font-bold text-secondary hover:text-primary">Register</a>
+			<a href={resolve('/register')} class="font-bold text-secondary hover:text-primary"
+				>Register</a
+			>
 			here!
 		</div>
 	</div>

@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 
 	let countdown = $state(3);
 
@@ -34,7 +35,7 @@
 			</div>
 			<div>
 				Redirecting to
-				<a href="/login" class="text-secondary hover:text-primary">login</a>
+				<a href={resolve('/login')} class="text-secondary hover:text-primary">login</a>
 				page in {countdown} second{countdown != 1 ? 's' : ''}.
 			</div>
 		{:else}

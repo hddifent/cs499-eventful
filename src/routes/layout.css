@@ -6,35 +6,36 @@
 @import '@skeletonlabs/skeleton-svelte';
 
 @theme {
-    --color-primary-hover: var(--color-teal-400);
-    --color-primary: var(--color-teal-500);
-    --color-secondary: var(--color-teal-800);
-    --color-bg: var(--color-surface-100);
-    --color-fg: var(--color-surface-950);
-    --color-gray1: var(--color-surface-200);
-    --color-gray2: var(--color-surface-300);
-    --color-error: var(--color-red-600);
+	--color-primary-hover: var(--color-teal-400);
+	--color-primary: var(--color-teal-500);
+	--color-secondary: var(--color-teal-800);
+	--color-bg: var(--color-surface-100);
+	--color-fg: var(--color-surface-950);
+	--color-gray1: var(--color-surface-200);
+	--color-gray2: var(--color-surface-300);
+	--color-error: var(--color-red-600);
 }
 
-[data-theme="dark"] {
-    --color-primary-hover: var(--color-teal-600);
-    --color-primary: var(--color-teal-500);
-    --color-secondary: var(--color-teal-300);
-    --color-bg: var(--color-surface-950);
-    --color-fg: var(--color-surface-100);
-    --color-gray1: var(--color-surface-800);
-    --color-gray2: var(--color-surface-700);
-    --color-error: var(--color-red-600);
+[data-theme='dark'] {
+	--color-primary-hover: var(--color-teal-600);
+	--color-primary: var(--color-teal-500);
+	--color-secondary: var(--color-teal-300);
+	--color-bg: var(--color-surface-950);
+	--color-fg: var(--color-surface-100);
+	--color-gray1: var(--color-surface-800);
+	--color-gray2: var(--color-surface-700);
+	--color-error: var(--color-red-600);
 }
 
 body {
-    @apply bg-bg text-fg;
-    transition:
-			background-color 0.25s ease-in-out,
-			color 0.25s ease-in-out;
+	@apply bg-bg text-fg;
+	transition:
+		background-color 0.25s ease-in-out,
+		color 0.25s ease-in-out;
 }
 
-button, a {
+button,
+a {
 	transition: all 0.1s ease-in-out;
 }
 
@@ -49,5 +50,5 @@ button, a {
 }
 
 @utility abs-center {
-	@apply abs-x-center abs-y-center;
+	@apply abs-y-center abs-x-center;
 }

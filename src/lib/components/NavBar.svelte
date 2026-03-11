@@ -8,6 +8,7 @@
 
 	import { Avatar, Popover } from 'melt/builders';
 	import { scale } from 'svelte/transition';
+	import { resolve } from '$app/paths';
 
 	interface NavbarConfig {
 		isLoggedIn: boolean;
@@ -39,9 +40,9 @@
 >
 	<!-- Left -->
 	<div class="flex min-w-1/8 items-center gap-8 text-bg">
-		<a href="/" class="py-2 text-2xl"><MdiHome /></a>
+		<a href={resolve('/')} class="py-2 text-2xl"><MdiHome /></a>
 		{#if !minimalInfoMode}
-			<a href="/events" class="py-2">Events</a>
+			<a href={resolve('/events')} class="py-2">Events</a>
 			<!-- <button class="py-2">Manual</button> -->
 		{/if}
 	</div>
@@ -75,7 +76,11 @@
 						class="popup-content min-w-40 space-y-2 rounded-lg bg-gray1 p-4 text-base font-normal text-fg shadow-md"
 						transition:scale={{ duration: 200, start: 0.9 }}
 					>
-						<a href="/account" class="flex items-center gap-x-2" data-sveltekit-preload-data="off">
+						<a
+							href={resolve('/account')}
+							class="flex items-center gap-x-2"
+							data-sveltekit-preload-data="off"
+						>
 							<MdiAccount /> My Profile
 						</a>
 
@@ -87,7 +92,10 @@
 					</div>
 				{/if}
 			{:else}
-				<a href="/login" class="flex items-center gap-x-2 rounded-lg bg-secondary px-4 py-2">
+				<a
+					href={resolve('/login')}
+					class="flex items-center gap-x-2 rounded-lg bg-secondary px-4 py-2"
+				>
 					<MdiLogin class="text-xl" /> Log In
 				</a>
 			{/if}

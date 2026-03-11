@@ -16,15 +16,15 @@
 	{...tabs.triggerList}
 	class="flex w-full flex-wrap items-center justify-center gap-x-16 gap-y-8 overflow-x-clip"
 >
-	{#each tabNames as id}
+	{#each tabNames as tab (tab)}
 		<button
 			class="group max-w-full min-w-0 bg-transparent font-bold text-ellipsis whitespace-nowrap transition outline-none"
-			{...tabs.getTrigger(id)}
+			{...tabs.getTrigger(tab)}
 		>
 			<div
 				class="overflow-clip px-4 transition group-data-active:text-primary group-[&:not([data-active]):hover]:text-secondary"
 			>
-				{id}
+				{tab}
 			</div>
 		</button>
 	{/each}
@@ -36,11 +36,11 @@
 </span>
 
 <!-- Tab Contents -->
-{#each tabNames as id}
-	<div {...tabs.getContent(id)}>
+{#each tabNames as tab (tab)}
+	<div {...tabs.getContent(tab)}>
 		<div class="mx-auto w-10/12">
 			<GridDisplay>
-				{#if id === 'Recomended'}
+				{#if tab === 'Recomended'}
 					<CardSquare data={[{ text: 'Recomended 1', importance: 'title' }]} />
 					<CardSquare data={[{ text: 'Recomended 2', importance: 'title' }]} />
 					<CardSquare data={[{ text: 'Recomended 3', importance: 'title' }]} />
@@ -54,12 +54,12 @@
 						data={[{ text: 'Recomended 6', importance: 'title' }]}
 					/>
 					<CardSquare data={[{ text: 'Recomended 7', importance: 'title' }]} />
-				{:else if id === 'Upcoming'}
+				{:else if tab === 'Upcoming'}
 					<CardSquare data={[{ text: 'Upcoming 1', importance: 'title' }]} />
 					<CardSquare data={[{ text: 'Upcoming 2', importance: 'title' }]} />
 					<CardSquare data={[{ text: 'Upcoming 3', importance: 'title' }]} />
 					<CardSquare data={[{ text: 'Upcoming 4', importance: 'title' }]} />
-				{:else if id === 'Apply for Booth'}
+				{:else if tab === 'Apply for Booth'}
 					<CardSquare data={[{ text: 'Apply for Booth 1', importance: 'title' }]} />
 					<CardSquare data={[{ text: 'Apply for Booth 2', importance: 'title' }]} />
 					<CardSquare data={[{ text: 'Apply for Booth 3', importance: 'title' }]} />

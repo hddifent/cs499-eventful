@@ -1,6 +1,5 @@
 <script lang="ts">
 	import TopCard from '$lib/components/TopCard.svelte';
-	import CardSquare from '$lib/components/CardSquare.svelte';
 	import GridDisplay from '$lib/components/GridDisplay.svelte';
 	import MultipleCombobox from '$lib/components/MultipleCombobox.svelte';
 
@@ -12,10 +11,8 @@
 
 	import { Dialog } from 'melt/builders';
 
-	import type { PageData } from './$types';
-
 	// Loaded data from API
-	const { data }: { data: PageData } = $props();
+	// const { data }: { data: PageData } = $props();
 
 	// Dialog Setups
 	const filterDialog = new Dialog({ closeOnOutsideClick: false });
@@ -69,14 +66,7 @@
 
 		<!-- Events Display -->
 		<GridDisplay>
-			{#each data.events as event}
-				<CardSquare
-					data={[
-						{ text: event.title, importance: 'title' },
-						{ text: event.description, importance: 'description' }
-					]}
-				/>
-			{/each}
+			<div>To do next...</div>
 		</GridDisplay>
 	</div>
 </div>
@@ -134,11 +124,18 @@
 
 		<!-- Confirmation Buttons -->
 		<div class="flex justify-end gap-4">
-			<button onclick={() => (filterDialog.open = false)} class="rounded-lg bg-gray2 px-4 py-2">
+			<button
+				onclick={() => (filterDialog.open = false)}
+				class="rounded-lg bg-gray2 px-4 py-2"
+			>
 				Cancel
 			</button>
-			<button onclick={resetFilter} class="rounded-lg bg-error px-4 py-2 text-bg">Reset</button>
-			<button onclick={applyFilter} class="rounded-lg bg-primary px-4 py-2 text-bg">Apply</button>
+			<button onclick={resetFilter} class="rounded-lg bg-error px-4 py-2 text-bg"
+				>Reset</button
+			>
+			<button onclick={applyFilter} class="rounded-lg bg-primary px-4 py-2 text-bg"
+				>Apply</button
+			>
 		</div>
 	</div>
 </dialog>
