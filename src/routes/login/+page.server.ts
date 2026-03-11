@@ -54,7 +54,7 @@ export const actions = {
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
             const body: LoginReturnBody = {
-                message: errorData.detail || 'Login failed. Please try again.',
+                message: errorData.detail || res.statusText,
                 data: { username }
             }
             return fail(res.status, body);

@@ -82,7 +82,7 @@ export const actions = {
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
             const body: RegistrationReturnBody = {
-                message: errorData.detail || 'Registration failed. Please try again.',
+                message: errorData.detail || res.statusText,
                 data: { email, username, displayName }
             }
             return fail(res.status, body);

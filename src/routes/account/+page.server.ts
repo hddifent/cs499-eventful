@@ -31,5 +31,5 @@ export const load: PageServerLoad = async ({ fetch, cookies }) => {
     }
 
     const errorData = await res.json().catch(() => ({}));
-    throw error(res.status, errorData.detail || "Could not fetch user profile. Please try again.");
+    throw error(res.status, errorData.detail || res.statusText);
 };

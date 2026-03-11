@@ -14,5 +14,5 @@ export const load: PageLoad = async ({ fetch, params }) => {
     }
 
     const errorData = await res.json().catch(() => ({}));
-    throw error(res.status, errorData.detail || "Could not fetch events. Please try again.");
+    throw error(res.status, errorData.detail || res.statusText);
 }
