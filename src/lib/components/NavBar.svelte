@@ -64,12 +64,16 @@
 		<!-- Right -->
 		<div class="flex min-w-1/8 items-center justify-end gap-4 text-bg">
 			{#if isLoggedIn}
+				<!-- Logged IN -->
 				<button onclick={handleShoppingListClick} class="py-2 text-2xl"><MdiList /></button>
 
-				<button class="h-10 w-10 rounded-full bg-secondary" {...userMenu.trigger}>
+				<button {...userMenu.trigger} class="h-10 w-10 rounded-full bg-secondary">
 					<img {...avatar.image} alt="" class="h-[inherit] rounded-full object-cover" />
-					<span {...avatar.fallback}><MdiAccount class="w-full text-center text-xl" /></span>
+					<span {...avatar.fallback}>
+						<MdiAccount class="w-full text-center text-xl" />
+					</span>
 				</button>
+
 				{#if userMenu.open}
 					<div
 						{...userMenu.content}
@@ -80,6 +84,9 @@
 							href={resolve('/account')}
 							class="flex items-center gap-x-2"
 							data-sveltekit-preload-data="off"
+							onclick={() => {
+								userMenu.open = false;
+							}}
 						>
 							<MdiAccount /> My Profile
 						</a>
@@ -87,11 +94,14 @@
 						<hr class="w-full border border-fg/50" />
 
 						<form action="/logout" method="POST">
-							<button class="flex items-center gap-x-2 text-error"><MdiLogout /> Logout</button>
+							<button class="flex items-center gap-x-2 text-error">
+								<MdiLogout /> Logout
+							</button>
 						</form>
 					</div>
 				{/if}
 			{:else}
+				<!-- Logged OUT -->
 				<a
 					href={resolve('/login')}
 					class="flex items-center gap-x-2 rounded-lg bg-secondary px-4 py-2"
