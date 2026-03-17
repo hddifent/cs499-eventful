@@ -15,7 +15,7 @@ export const load: LayoutServerLoad = async ({ fetch, cookies }) => {
 		return body;
 	}
 
-	const res = await fetch('/api/users/me', {
+	const res = await fetch('/api/users/profile', {
 		method: 'GET'
 	});
 
