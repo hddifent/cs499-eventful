@@ -1,5 +1,4 @@
 <script lang="ts">
-	import MdiAccount from 'virtual:icons/mdi/account';
 	import MdiGeneral from 'virtual:icons/mdi/information';
 	import MdiGroup from 'virtual:icons/mdi/account-group';
 	import MdiEvent from 'virtual:icons/mdi/calendar';
@@ -8,12 +7,11 @@
 
 	import MdiGroupAdd from 'virtual:icons/mdi/account-multiple-plus';
 
-	import { Avatar, Tabs } from 'melt/builders';
+	import { Tabs } from 'melt/builders';
 	import type { PageServerData } from './$types';
+	import UserBanner from '$lib/components/UserBanner.svelte';
 
 	const { data }: { data: PageServerData } = $props();
-
-	const avatar = new Avatar({ src: () => data.user.pfpUrl });
 
 	const tabNames = [
 		'General',
@@ -43,6 +41,23 @@
 	{/if}
 {/snippet}
 
+{#snippet orgList(
+	label: string,
+	data: {
+		uniqueName: string;
+		displayName: string;
+	}[]
+)}
+	<div class="text-2xl font-bold">{label} ({data.length})</div>
+	{#if data.length > 0}
+		{#each data as d (d.uniqueName)}
+			<div>Group: {d.displayName}</div>
+		{/each}
+	{:else}
+		<div>None</div>
+	{/if}
+{/snippet}
+
 {#snippet orgGroupContent()}
 	<div class="space-y-2">
 		<button class="rounded-lg bg-primary px-4 py-2 hover:bg-primary-hover">
@@ -53,15 +68,13 @@
 			<hr class="w-full border border-fg/50" />
 		</span>
 
-		<div class="text-2xl font-bold">Invitations (0)</div>
-		<div>None</div>
+		{@render orgList('Invitations', data.orgs.invited)}
 
 		<span class="flex w-full items-center justify-center py-2">
 			<hr class="w-full border border-fg/50" />
 		</span>
 
-		<div class="text-2xl font-bold">My Groups (0)</div>
-		<div>None</div>
+		{@render orgList('My Groups', data.orgs.joined)}
 	</div>
 {/snippet}
 
@@ -81,24 +94,11 @@
 
 <div class="p-8">
 	<!-- Flex User Profile -->
-	<div class="flex items-center gap-x-4">
-		<!-- Avatar -->
-		<div class="h-24 w-24 rounded-full">
-			<img {...avatar.image} alt="" class="h-full w-full rounded-full object-cover" />
-			<span
-				{...avatar.fallback}
-				class="flex h-full w-full items-center justify-center rounded-full bg-secondary text-bg"
-			>
-				<MdiAccount class="text-5xl" />
-			</span>
-		</div>
-
-		<!-- Names -->
-		<div class="space-y-2">
-			<div class="text-5xl font-bold">{data.user.displayName}</div>
-			<div class="text-2xl">@{data.user.username}</div>
-		</div>
-	</div>
+	<UserBanner
+		username={data.user.username}
+		displayName={data.user.displayName}
+		pfpUrl={data.user.pfpUrl}
+	/>
 
 	<span class="flex w-full items-center justify-center py-4">
 		<hr class="w-full border border-fg/50" />
