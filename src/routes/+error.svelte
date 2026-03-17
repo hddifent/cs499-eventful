@@ -20,13 +20,19 @@
 			return () => clearInterval(interval);
 		}
 	});
+
+	const defErrMsg = (msg: string | undefined, defaultMsg: string) => {
+		return !msg || msg === '' ? defaultMsg : msg;
+	};
 </script>
 
 <div class="py-8">
 	<div class="space-y-2 px-8">
 		<div class="space-x-2">
 			<span class="text-5xl font-bold">{page.status}</span>
-			<span class="text-2xl">{page.error?.message}</span>
+			<span class="text-2xl">
+				{defErrMsg(page.error?.message, 'Could not connect to server.')}
+			</span>
 		</div>
 		{#if page.status === 401}
 			<div>
