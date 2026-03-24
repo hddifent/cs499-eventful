@@ -10,6 +10,7 @@
 	import { Tabs } from 'melt/builders';
 	import type { PageServerData } from './$types';
 	import UserBanner from '$lib/components/UserBanner.svelte';
+	import { resolve } from '$app/paths';
 
 	const { data }: { data: PageServerData } = $props();
 
@@ -60,9 +61,12 @@
 
 {#snippet orgGroupContent()}
 	<div class="space-y-2">
-		<button class="rounded-lg bg-primary px-4 py-2 hover:bg-primary-hover">
-			<span class="flex items-center gap-x-2"><MdiGroupAdd /> Create a new group</span>
-		</button>
+		<a
+			href={resolve('/orgs/create')}
+			class="flex w-fit items-center gap-x-2 rounded-lg bg-primary px-4 py-2 hover:bg-primary-hover"
+		>
+			<MdiGroupAdd /> Create a new group
+		</a>
 
 		<span class="flex w-full items-center justify-center py-2">
 			<hr class="w-full border border-fg/50" />
