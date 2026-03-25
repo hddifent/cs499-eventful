@@ -9,6 +9,7 @@
 	import { Avatar, Popover } from 'melt/builders';
 	import { scale } from 'svelte/transition';
 	import { resolve } from '$app/paths';
+	import { invalidateAll } from '$app/navigation';
 
 	interface NavbarConfig {
 		isLoggedIn: boolean;
@@ -94,7 +95,12 @@
 						<hr class="w-full border border-fg/50" />
 
 						<form action="/logout" method="POST">
-							<button class="flex items-center gap-x-2 text-error">
+							<button
+								class="flex items-center gap-x-2 text-error"
+								onclick={async () => {
+									await invalidateAll();
+								}}
+							>
 								<MdiLogout /> Logout
 							</button>
 						</form>
