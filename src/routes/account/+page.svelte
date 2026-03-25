@@ -11,6 +11,7 @@
 	import type { PageServerData } from './$types';
 	import UserBanner from '$lib/components/UserBanner.svelte';
 	import { resolve } from '$app/paths';
+	import CardItem from '$lib/components/CardItem.svelte';
 
 	const { data }: { data: PageServerData } = $props();
 
@@ -47,12 +48,18 @@
 	data: {
 		uniqueName: string;
 		displayName: string;
-	}[]
+	}[],
+	linkTo: 'manage' | 'details'
 )}
 	<div class="text-2xl font-bold">{label} ({data.length})</div>
 	{#if data.length > 0}
 		{#each data as d (d.uniqueName)}
-			<div>Group: {d.displayName}</div>
+			<CardItem
+				type="USER"
+				title={d.displayName}
+				subtitle={d.uniqueName}
+				clickLink={resolve(`/orgs/${linkTo}/${d.uniqueName}`)}
+			/>
 		{/each}
 	{:else}
 		<div>None</div>
@@ -72,13 +79,13 @@
 			<hr class="w-full border border-fg/50" />
 		</span>
 
-		{@render orgList('Invitations', data.orgs.invited)}
+		{@render orgList('Invitations', data.orgs.invited, 'details')}
 
 		<span class="flex w-full items-center justify-center py-2">
 			<hr class="w-full border border-fg/50" />
 		</span>
 
-		{@render orgList('My Groups', data.orgs.joined)}
+		{@render orgList('My Groups', data.orgs.joined, 'manage')}
 	</div>
 {/snippet}
 
@@ -111,7 +118,7 @@
 	<!-- Menu -->
 	<div class="flex space-x-4">
 		<!-- Tab Menu -->
-		<div {...accountTabs.triggerList} class="w-min space-y-1">
+		<div {...accountTabs.triggerList} class="w-min min-w-1/5 space-y-1">
 			{#each tabNames as t (t)}
 				<button
 					class="group w-full bg-transparent font-bold text-ellipsis whitespace-nowrap transition outline-none"
