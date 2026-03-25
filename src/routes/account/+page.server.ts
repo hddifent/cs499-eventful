@@ -1,5 +1,12 @@
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { error, fail } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
+import z from 'zod';
+import { zUsernameLikeField } from '$lib/snippets/zodFields';
+
+const orgActionSchema = z.object({
+	orgUniqueName: zUsernameLikeField(),
+	answer: z.enum(['acceptinvite', 'rejectinvite'])
+});
 
 interface APIOrg {
 	org_unique_name: string;
@@ -29,6 +36,10 @@ interface AccountReturnBody {
 		invited: Org[];
 		joined: Org[];
 	};
+}
+
+interface OrgActionReturnBody {
+	success: boolean;
 }
 
 function _apiOrgToOrgList(data: APIOrg[]): Org[] {
@@ -66,3 +77,40 @@ export const load: PageServerLoad = async ({ fetch, cookies }) => {
 	const errorData = await res.json().catch(() => ({}));
 	throw error(res.status, errorData.detail || res.statusText);
 };
+
+export const actions = {
+	default: async ({ request, fetch }) => {
+		const formData = Object.fromEntries(await request.formData());
+
+		const validationResult = orgActionSchema.safeParse(formData);
+		if (!validationResult.success) {
+			const body: OrgActionReturnBody = {
+				success: false
+			};
+			return fail(400, body);
+		}
+
+		const { orgUniqueName, answer } = validationResult.data;
+		const reqPayload = {
+			org_unique_name: orgUniqueName
+		};
+
+		const res = await fetch(`/api/orgs/${answer}`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(reqPayload)
+		});
+
+		if (!res.ok) {
+			const body: OrgActionReturnBody = {
+				success: false
+			};
+			return fail(res.status, body);
+		}
+
+		const body: OrgActionReturnBody = {
+			success: true
+		};
+		return body;
+	}
+} satisfies Actions;

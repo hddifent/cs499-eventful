@@ -7,11 +7,16 @@
 
 	import MdiGroupAdd from 'virtual:icons/mdi/account-multiple-plus';
 
+	import MdiAccept from 'virtual:icons/mdi/check';
+	import MdiDeny from 'virtual:icons/mdi/close';
+
 	import { Tabs } from 'melt/builders';
-	import type { PageServerData } from './$types';
+	import type { PageServerData, SubmitFunction } from './$types';
 	import UserBanner from '$lib/components/UserBanner.svelte';
 	import { resolve } from '$app/paths';
 	import CardItem from '$lib/components/CardItem.svelte';
+	import type { Snippet } from 'svelte';
+	import { enhance } from '$app/forms';
 
 	const { data }: { data: PageServerData } = $props();
 
@@ -27,6 +32,15 @@
 		value: tabNames[0],
 		orientation: 'vertical'
 	});
+
+	const COMMON_ACTIONBUTTON_STYLE =
+		'flex h-12 min-h-12 w-12 min-w-12 items-center justify-center rounded-full';
+
+	const handleInviteResponse: SubmitFunction = () => {
+		return async ({ update }) => {
+			await update();
+		};
+	};
 </script>
 
 {#snippet tabIcon(tab: TabId)}
@@ -43,22 +57,50 @@
 	{/if}
 {/snippet}
 
+{#snippet orgInviteAcceptAction(uniqueName: string)}
+	<form method="POST" use:enhance={handleInviteResponse}>
+		<input type="hidden" name="orgUniqueName" value={uniqueName} />
+		<input type="hidden" name="answer" value="acceptinvite" />
+		<button class="{COMMON_ACTIONBUTTON_STYLE} bg-primary text-bg">
+			<MdiAccept class="text-2xl" />
+		</button>
+	</form>
+{/snippet}
+
+{#snippet orgInviteDenyAction(uniqueName: string)}
+	<form method="POST" use:enhance={handleInviteResponse}>
+		<input type="hidden" name="orgUniqueName" value={uniqueName} />
+		<input type="hidden" name="answer" value="rejectinvite" />
+		<button class="{COMMON_ACTIONBUTTON_STYLE} bg-error text-bg">
+			<MdiDeny class="text-2xl" />
+		</button>
+	</form>
+{/snippet}
+
 {#snippet orgList(
 	label: string,
-	data: {
-		uniqueName: string;
-		displayName: string;
-	}[],
-	linkTo: 'manage' | 'details'
+	data: { uniqueName: string; displayName: string }[],
+	linkTo: 'manage' | 'details',
+	actions?: Snippet<[string]>[]
 )}
 	<div class="text-2xl font-bold">{label} ({data.length})</div>
 	{#if data.length > 0}
 		{#each data as d (d.uniqueName)}
+			{#snippet rowActions()}
+				{#if actions}
+					<div class="flex items-center gap-x-2">
+						{#each actions as action (action)}
+							{@render action(d.uniqueName)}
+						{/each}
+					</div>
+				{/if}
+			{/snippet}
 			<CardItem
 				type="USER"
 				title={d.displayName}
 				subtitle={d.uniqueName}
 				clickLink={resolve(`/orgs/${linkTo}/${d.uniqueName}`)}
+				actionItems={rowActions}
 			/>
 		{/each}
 	{:else}
@@ -79,13 +121,16 @@
 			<hr class="w-full border border-fg/50" />
 		</span>
 
-		{@render orgList('Invitations', data.orgs.invited, 'details')}
+		{@render orgList('My Groups', data.orgs.joined, 'manage')}
 
 		<span class="flex w-full items-center justify-center py-2">
 			<hr class="w-full border border-fg/50" />
 		</span>
 
-		{@render orgList('My Groups', data.orgs.joined, 'manage')}
+		{@render orgList('Invitations', data.orgs.invited, 'details', [
+			orgInviteAcceptAction,
+			orgInviteDenyAction
+		])}
 	</div>
 {/snippet}
 

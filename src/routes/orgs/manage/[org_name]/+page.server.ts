@@ -71,7 +71,7 @@ function _apiMemberToUserList(data: APIMember[], memberStatus: MemberStatus): Re
 }
 
 export const load: PageServerLoad = async ({ fetch, cookies, params }) => {
-	const res = await fetch(`/api/orgs/${params.org_name}/full`, {
+	const res = await fetch(`/api/orgs/profile/${params.org_name}/full`, {
 		method: 'GET'
 	});
 
