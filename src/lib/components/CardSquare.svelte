@@ -19,10 +19,9 @@
 	interface CardData {
 		imgSrc?: string;
 		data?: DisplayData[];
-		href?: string;
 	}
 
-	let { imgSrc = '', data = [], href }: CardData = $props();
+	let { imgSrc = '', data = [] }: CardData = $props();
 
 	const avatar = new Avatar({ src: () => imgSrc });
 </script>
@@ -42,18 +41,12 @@
 
 	<!-- Descriptions -->
 	<div class="h-fit overflow-clip rounded-b-lg bg-gray1 px-4 py-2 text-ellipsis shadow-md">
-		{#each data as d}
+		{#each data as d (d)}
 			<div class={textClass[d.importance]}>{d.text}</div>
 		{/each}
 	</div>
 {/snippet}
 
 <div class="rounded-lg">
-	{#if href}
-		<a {href}>
-			{@render card()}
-		</a>
-	{:else}
-		{@render card()}
-	{/if}
+	{@render card()}
 </div>

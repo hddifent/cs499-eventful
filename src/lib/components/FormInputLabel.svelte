@@ -5,7 +5,18 @@
 	import MdiLock from 'virtual:icons/mdi/lock';
 	import MdiLockCheck from 'virtual:icons/mdi/lock-check';
 
-	export { emailLabel, usernameLabel, displayNameLabel, passwordLabel, confirmPasswordLabel };
+	import MdiOrgUnique from 'virtual:icons/mdi/account-group';
+	import MdiOrgDisp from 'virtual:icons/mdi/account-group-outline';
+
+	export {
+		emailLabel,
+		usernameLabel,
+		displayNameLabel,
+		passwordLabel,
+		confirmPasswordLabel,
+		orgUniqueNameLabel,
+		orgDisplayNameLabel
+	};
 </script>
 
 {#snippet emailLabel()}
@@ -26,4 +37,12 @@
 
 {#snippet confirmPasswordLabel()}
 	<MdiLockCheck /> Confirm Password
+{/snippet}
+
+{#snippet orgUniqueNameLabel()}
+	<MdiOrgUnique /> Group Unique Name
+{/snippet}
+
+{#snippet orgDisplayNameLabel()}
+	<MdiOrgDisp /> Group Display Name
 {/snippet}

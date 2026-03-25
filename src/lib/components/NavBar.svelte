@@ -8,6 +8,8 @@
 
 	import { Avatar, Popover } from 'melt/builders';
 	import { scale } from 'svelte/transition';
+	import { resolve } from '$app/paths';
+	import { invalidateAll } from '$app/navigation';
 
 	interface NavbarConfig {
 		isLoggedIn: boolean;
@@ -39,9 +41,9 @@
 >
 	<!-- Left -->
 	<div class="flex min-w-1/8 items-center gap-8 text-bg">
-		<a href="/" class="py-2 text-2xl"><MdiHome /></a>
+		<a href={resolve('/')} class="py-2 text-2xl"><MdiHome /></a>
 		{#if !minimalInfoMode}
-			<a href="/events" class="py-2">Events</a>
+			<a href={resolve('/events')} class="py-2">Events</a>
 			<!-- <button class="py-2">Manual</button> -->
 		{/if}
 	</div>
@@ -63,27 +65,53 @@
 		<!-- Right -->
 		<div class="flex min-w-1/8 items-center justify-end gap-4 text-bg">
 			{#if isLoggedIn}
+				<!-- Logged IN -->
 				<button onclick={handleShoppingListClick} class="py-2 text-2xl"><MdiList /></button>
 
-				<button class="h-10 w-10 rounded-full bg-secondary" {...userMenu.trigger}>
+				<button {...userMenu.trigger} class="h-10 w-10 rounded-full bg-secondary">
 					<img {...avatar.image} alt="" class="h-[inherit] rounded-full object-cover" />
-					<span {...avatar.fallback}><MdiAccount class="w-full text-center text-xl" /></span>
+					<span {...avatar.fallback}>
+						<MdiAccount class="w-full text-center text-xl" />
+					</span>
 				</button>
+
 				{#if userMenu.open}
 					<div
 						{...userMenu.content}
 						class="popup-content min-w-40 space-y-2 rounded-lg bg-gray1 p-4 text-base font-normal text-fg shadow-md"
 						transition:scale={{ duration: 200, start: 0.9 }}
 					>
-						<div class="flex items-center gap-x-2"><MdiAccount /> My Profile</div>
+						<a
+							href={resolve('/account')}
+							class="flex items-center gap-x-2"
+							data-sveltekit-preload-data="off"
+							onclick={() => {
+								userMenu.open = false;
+							}}
+						>
+							<MdiAccount /> My Profile
+						</a>
+
 						<hr class="w-full border border-fg/50" />
+
 						<form action="/logout" method="POST">
-							<button class="flex items-center gap-x-2 text-error"><MdiLogout /> Logout</button>
+							<button
+								class="flex items-center gap-x-2 text-error"
+								onclick={async () => {
+									await invalidateAll();
+								}}
+							>
+								<MdiLogout /> Logout
+							</button>
 						</form>
 					</div>
 				{/if}
 			{:else}
-				<a href="/login" class="flex items-center gap-x-2 rounded-lg bg-secondary px-4 py-2">
+				<!-- Logged OUT -->
+				<a
+					href={resolve('/login')}
+					class="flex items-center gap-x-2 rounded-lg bg-secondary px-4 py-2"
+				>
 					<MdiLogin class="text-xl" /> Log In
 				</a>
 			{/if}

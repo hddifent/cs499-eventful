@@ -159,7 +159,7 @@
 
 		<!-- Image Preview -->
 		<div class="flex gap-y-4">
-			{#each previewDisplay as display, i}
+			{#each previewDisplay as display, i (display.label)}
 				<div class="flex w-full flex-col items-center justify-start gap-y-2">
 					<p>
 						--- {display.label}{!uploadImgDimensions[i]
@@ -212,7 +212,9 @@
 					alt=""
 				/>
 
-				<canvas bind:this={displayCanvasElement} class="pointer-events-none absolute top-0 left-0"
+				<canvas
+					bind:this={displayCanvasElement}
+					class="pointer-events-none absolute top-0 left-0"
 				></canvas>
 			</div>
 		{/if}

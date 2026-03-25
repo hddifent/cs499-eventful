@@ -57,7 +57,9 @@
 	const onInputValueChange: ComboboxRootProps['onInputValueChange'] = (event) => {
 		isBoxOpened = event.inputValue !== '';
 		searchingItems = items.filter((item) =>
-			item.aliases.some((alias) => alias.toLowerCase().includes(event.inputValue.toLowerCase()))
+			item.aliases.some((alias) =>
+				alias.toLowerCase().includes(event.inputValue.toLowerCase())
+			)
 		);
 		highlightedItem = searchingItems.length > 0 ? searchingItems[0].aliases[0] : null;
 	};
@@ -174,7 +176,9 @@
 								if (!selectedItems.includes(item.aliases[0])) {
 									selectedItems = [...selectedItems, item.aliases[0]];
 								} else {
-									selectedItems = selectedItems.filter((si) => si !== item.aliases[0]);
+									selectedItems = selectedItems.filter(
+										(si) => si !== item.aliases[0]
+									);
 								}
 							}}
 							bind:this={itemListElement[i]}

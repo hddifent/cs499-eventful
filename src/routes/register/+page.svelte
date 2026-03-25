@@ -14,6 +14,7 @@
 		passwordLabel,
 		confirmPasswordLabel
 	} from '$lib/components/FormInputLabel.svelte';
+	import { resolve } from '$app/paths';
 
 	let { form }: { form: ActionData } = $props();
 
@@ -24,7 +25,7 @@
 
 	const handleRegister: SubmitFunction = () => {
 		isRegistering = true;
-		return async ({ update, result }) => {
+		return async ({ update }) => {
 			isRegistering = false;
 			await update();
 			_t_pwd = '';
@@ -44,36 +45,36 @@
 			novalidate
 		>
 			<FormInputBox
-				name={'email'}
-				type={'email'}
+				name="email"
+				type="email"
 				inputLabel={emailLabel}
 				value={form?.data?.email}
 				errorMessage={form?.validationError?.fieldErrors.email?.[0]}
 			/>
 			<FormInputBox
-				name={'username'}
-				type={'text'}
+				name="username"
+				type="text"
 				inputLabel={usernameLabel}
 				value={form?.data?.username}
 				errorMessage={form?.validationError?.fieldErrors.username?.[0]}
 			/>
 			<FormInputBox
-				name={'displayName'}
-				type={'text'}
+				name="displayName"
+				type="text"
 				inputLabel={displayNameLabel}
 				value={form?.data?.displayName}
 				errorMessage={form?.validationError?.fieldErrors.displayName?.[0]}
 			/>
 			<FormInputBox
-				name={'password'}
-				type={'password'}
+				name="password"
+				type="password"
 				inputLabel={passwordLabel}
 				bind:value={_t_pwd}
 				errorMessage={form?.validationError?.fieldErrors.password?.[0]}
 			/>
 			<FormInputBox
-				name={'confirmPassword'}
-				type={'password'}
+				name="confirmPassword"
+				type="password"
 				inputLabel={confirmPasswordLabel}
 				bind:value={_t_cpwd}
 				errorMessage={form?.validationError?.fieldErrors.confirmPassword?.[0]}
@@ -94,7 +95,9 @@
 		{/if}
 		<div class="mx-auto w-max text-sm">
 			Already have an account?
-			<a href="/login" class="font-bold text-secondary hover:text-primary">Log in</a>
+			<a href={resolve('/login')} class="font-bold text-secondary hover:text-primary"
+				>Log in</a
+			>
 			here!
 		</div>
 	</div>

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import TopCard from '$lib/components/TopCard.svelte';
-	import CardSquare from '$lib/components/CardSquare.svelte';
 	import GridDisplay from '$lib/components/GridDisplay.svelte';
 	import MultipleCombobox from '$lib/components/MultipleCombobox.svelte';
 
@@ -12,10 +11,8 @@
 
 	import { Dialog } from 'melt/builders';
 
-	import type { PageProps } from './$types';
-
 	// Loaded data from API
-	const { data }: PageProps = $props();
+	// const { data }: { data: PageData } = $props();
 
 	// Dialog Setups
 	const filterDialog = new Dialog({ closeOnOutsideClick: false });
@@ -69,14 +66,7 @@
 
 		<!-- Events Display -->
 		<GridDisplay>
-			{#each data.events as event}
-				<CardSquare
-					data={[
-						{ text: event.title, importance: 'title' },
-						{ text: event.description, importance: 'description' }
-					]}
-				/>
-			{/each}
+			<div>To do next...</div>
 		</GridDisplay>
 	</div>
 </div>
@@ -134,11 +124,18 @@
 
 		<!-- Confirmation Buttons -->
 		<div class="flex justify-end gap-4">
-			<button onclick={() => (filterDialog.open = false)} class="rounded-lg bg-gray2 px-4 py-2">
+			<button
+				onclick={() => (filterDialog.open = false)}
+				class="rounded-lg bg-gray2 px-4 py-2"
+			>
 				Cancel
 			</button>
-			<button onclick={resetFilter} class="rounded-lg bg-error px-4 py-2 text-bg">Reset</button>
-			<button onclick={applyFilter} class="rounded-lg bg-primary px-4 py-2 text-bg">Apply</button>
+			<button onclick={resetFilter} class="rounded-lg bg-error px-4 py-2 text-bg"
+				>Reset</button
+			>
+			<button onclick={applyFilter} class="rounded-lg bg-primary px-4 py-2 text-bg"
+				>Apply</button
+			>
 		</div>
 	</div>
 </dialog>
@@ -147,7 +144,7 @@
 	dialog {
 		opacity: 0;
 		scale: 0.9;
-		transition: opacity 200ms ease scale 200ms ease;
+		transition: all 200ms ease-in-out;
 	}
 
 	dialog::backdrop {
@@ -159,17 +156,13 @@
 		scale: 1;
 	}
 
-	button {
-		transition: background-color 200ms ease;
-	}
-
 	[data-melt-dialog-overlay] {
 		position: fixed;
 		width: 100%;
 		height: 100%;
 		background: color-mix(in oklab, var(--color-fg) 50%, transparent);
 		opacity: 0;
-		transition: opacity 200ms ease;
+		transition: opacity 200ms ease-in-out;
 	}
 
 	[data-melt-dialog-overlay][data-open] {

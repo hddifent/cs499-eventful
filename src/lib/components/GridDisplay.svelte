@@ -8,6 +8,9 @@
 
 <style>
 	.display-grid {
-		grid-template-columns: repeat(auto-fill, minmax(calc(var(--spacing) * var(--min-size)), 1fr));
+		grid-template-columns: repeat(
+			auto-fill,
+			minmax(calc(var(--spacing) * var(--min-size)), 1fr)
+		);
 	}
 </style>
