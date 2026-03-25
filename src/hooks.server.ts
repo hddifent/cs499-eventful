@@ -18,7 +18,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	// Catch protected routes
-	const protectedRoutes = ['/account'];
+	const protectedRoutes = ['/account', '/orgs/manage', '/orgs/create'];
 	const acessingProtected = protectedRoutes.some((route) => event.url.pathname.startsWith(route));
 	const sessionExists = event.cookies.get('session_token') != undefined;
 
@@ -26,5 +26,16 @@ export const handle: Handle = async ({ event, resolve }) => {
 		throw redirect(303, '/login');
 	}
 
-	return resolve(event);
+	const response = await resolve(event);
+
+	if (acessingProtected) {
+		response.headers.set(
+			'Cache-Control',
+			'no-store, no-cache, must-revalidate, proxy-revalidate'
+		);
+		response.headers.set('Pragma', 'no-cache');
+		response.headers.set('Expires', '0');
+	}
+
+	return response;
 };

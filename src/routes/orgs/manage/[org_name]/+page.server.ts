@@ -1,5 +1,11 @@
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { error, fail } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
+import z from 'zod';
+import { zUsernameLikeField } from '$lib/snippets/zodFields';
+
+const inviteSchema = z.object({
+	username: zUsernameLikeField()
+});
 
 type MemberStatus = 'INVITED' | 'JOINED';
 
@@ -39,6 +45,19 @@ interface OrgManageReturnBody {
 	members: {
 		joined: RetUser[];
 		invited: RetUser[];
+	};
+}
+
+interface InviteReturnBody {
+	validationError?: {
+		fieldErrors: {
+			username?: string[];
+		};
+		formErrors: string[];
+	};
+	message?: string;
+	data?: {
+		username?: string;
 	};
 }
 
@@ -83,3 +102,42 @@ export const load: PageServerLoad = async ({ fetch, cookies, params }) => {
 	const errorData = await res.json().catch(() => ({}));
 	throw error(res.status, errorData.detail || res.statusText);
 };
+
+export const actions = {
+	invite: async ({ request, fetch, params }) => {
+		const formData = Object.fromEntries(await request.formData());
+
+		const validationResult = inviteSchema.safeParse(formData);
+		if (!validationResult.success) {
+			const fieldErrors = z.flattenError(validationResult.error);
+			const body: InviteReturnBody = {
+				validationError: fieldErrors,
+				data: {
+					username: formData.username as string
+				}
+			};
+			return fail(400, body);
+		}
+
+		const { username } = validationResult.data;
+		const reqPayload = {
+			org_unique_name: params.org_name,
+			username: username
+		};
+
+		const res = await fetch('/api/orgs/invite', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(reqPayload)
+		});
+
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			const body: InviteReturnBody = {
+				message: errorData.detail || res.statusText,
+				data: { username }
+			};
+			return fail(res.status, body);
+		}
+	}
+} satisfies Actions;
