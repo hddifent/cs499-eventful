@@ -2,6 +2,7 @@ import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import z from 'zod';
 import { zUsernameLikeField } from '$lib/snippets/zodFields';
+import { verifyAuth } from '$lib/server/basicAuth';
 
 const inviteSchema = z.object({
 	username: zUsernameLikeField()
@@ -70,6 +71,8 @@ function _apiMemberToUserList(data: APIMember[], memberStatus: MemberStatus): Re
 	}));
 }
 
+export const prerender = false;
+
 export const load: PageServerLoad = async ({ fetch, cookies, params }) => {
 	const res = await fetch(`/api/orgs/profile/${params.org_name}/full`, {
 		method: 'GET'
@@ -104,8 +107,10 @@ export const load: PageServerLoad = async ({ fetch, cookies, params }) => {
 };
 
 export const actions = {
-	invite: async ({ request, fetch, params }) => {
-		const formData = Object.fromEntries(await request.formData());
+	invite: async (event) => {
+		await verifyAuth(event);
+
+		const formData = Object.fromEntries(await event.request.formData());
 
 		const validationResult = inviteSchema.safeParse(formData);
 		if (!validationResult.success) {
@@ -121,11 +126,11 @@ export const actions = {
 
 		const { username } = validationResult.data;
 		const reqPayload = {
-			org_unique_name: params.org_name,
+			org_unique_name: event.params.org_name,
 			username: username
 		};
 
-		const res = await fetch('/api/orgs/invite', {
+		const res = await event.fetch('/api/orgs/invite', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(reqPayload)

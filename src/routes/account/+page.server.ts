@@ -2,6 +2,7 @@ import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import z from 'zod';
 import { zUsernameLikeField } from '$lib/snippets/zodFields';
+import { verifyAuth } from '$lib/server/basicAuth';
 
 const orgActionSchema = z.object({
 	orgUniqueName: zUsernameLikeField(),
@@ -49,8 +50,10 @@ function _apiOrgToOrgList(data: APIOrg[]): Org[] {
 	}));
 }
 
-export const load: PageServerLoad = async ({ fetch, cookies }) => {
-	const res = await fetch('/api/users/profile', {
+export const prerender = false;
+
+export const load: PageServerLoad = async (event) => {
+	const res = await event.fetch('/api/users/profile', {
 		method: 'GET'
 	});
 
@@ -71,7 +74,7 @@ export const load: PageServerLoad = async ({ fetch, cookies }) => {
 	}
 
 	if (res.status === 401) {
-		cookies.delete('session_token', { path: '/' });
+		event.cookies.delete('session_token', { path: '/' });
 	}
 
 	const errorData = await res.json().catch(() => ({}));
@@ -79,8 +82,10 @@ export const load: PageServerLoad = async ({ fetch, cookies }) => {
 };
 
 export const actions = {
-	default: async ({ request, fetch }) => {
-		const formData = Object.fromEntries(await request.formData());
+	default: async (event) => {
+		await verifyAuth(event);
+
+		const formData = Object.fromEntries(await event.request.formData());
 
 		const validationResult = orgActionSchema.safeParse(formData);
 		if (!validationResult.success) {
@@ -95,7 +100,7 @@ export const actions = {
 			org_unique_name: orgUniqueName
 		};
 
-		const res = await fetch(`/api/orgs/${answer}`, {
+		const res = await event.fetch(`/api/orgs/${answer}`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(reqPayload)

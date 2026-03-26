@@ -1,7 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { z } from 'zod';
 import { zDisplayNameLikeField, zUsernameLikeField } from '$lib/snippets/zodFields';
+import { verifyAuth } from '$lib/server/basicAuth';
 
 const createOrgSchema = z.object({
 	uniqueName: zUsernameLikeField('Unique name'),
@@ -23,9 +24,17 @@ interface RegistrationReturnBody {
 	};
 }
 
+export const prerender = false;
+
+export const load: PageServerLoad = async (event) => {
+	await verifyAuth(event);
+};
+
 export const actions = {
-	default: async ({ request, fetch }) => {
-		const formData = Object.fromEntries(await request.formData());
+	default: async (event) => {
+		await verifyAuth(event);
+
+		const formData = Object.fromEntries(await event.request.formData());
 
 		const validationResult = createOrgSchema.safeParse(formData);
 		if (!validationResult.success) {
@@ -46,7 +55,7 @@ export const actions = {
 			org_display_name: displayName
 		};
 
-		const res = await fetch('/api/orgs/new', {
+		const res = await event.fetch('/api/orgs/new', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(reqPayload)

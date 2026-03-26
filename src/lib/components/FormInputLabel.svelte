@@ -8,6 +8,14 @@
 	import MdiOrgUnique from 'virtual:icons/mdi/account-group';
 	import MdiOrgDisp from 'virtual:icons/mdi/account-group-outline';
 
+	import MdiEvent from 'virtual:icons/mdi/calendar';
+	import MdiDescription from 'virtual:icons/mdi/format-list-bulleted';
+	import MdiLocation from 'virtual:icons/mdi/map-marker';
+	import MdiLink from 'virtual:icons/mdi/link-variant';
+	import MdiDate from 'virtual:icons/mdi/calendar-clock';
+	import MdiTime from 'virtual:icons/mdi/clock';
+	import MdiDay from 'virtual:icons/mdi/calendar-badge';
+
 	export {
 		emailLabel,
 		usernameLabel,
@@ -15,7 +23,14 @@
 		passwordLabel,
 		confirmPasswordLabel,
 		orgUniqueNameLabel,
-		orgDisplayNameLabel
+		orgDisplayNameLabel,
+		eventNameLabel,
+		eventDescriptionLabel,
+		eventLocationLabel,
+		eventApplyLinkLabel,
+		applicationDateLabel,
+		eventDaysTimeLabel,
+		eventDaysLabel
 	};
 </script>
 
@@ -45,4 +60,32 @@
 
 {#snippet orgDisplayNameLabel()}
 	<MdiOrgDisp /> Group Display Name
+{/snippet}
+
+{#snippet eventNameLabel()}
+	<MdiEvent /> Event Name
+{/snippet}
+
+{#snippet eventDescriptionLabel()}
+	<MdiDescription /> Description
+{/snippet}
+
+{#snippet eventLocationLabel()}
+	<MdiLocation /> Location
+{/snippet}
+
+{#snippet eventApplyLinkLabel()}
+	<MdiLink /> Application Form Link
+{/snippet}
+
+{#snippet applicationDateLabel()}
+	<MdiDate /> Application Period
+{/snippet}
+
+{#snippet eventDaysTimeLabel(index: number)}
+	<MdiTime /> Day {index}
+{/snippet}
+
+{#snippet eventDaysLabel()}
+	<MdiDay /> Event Days
 {/snippet}
