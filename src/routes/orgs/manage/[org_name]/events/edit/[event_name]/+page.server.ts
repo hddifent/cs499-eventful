@@ -65,6 +65,18 @@ interface APIEventDay {
 	eventday_timezone: string;
 }
 
+interface APIUserProfile {
+	username: string;
+	user_display_name: string;
+	pfp_url: string;
+}
+
+interface APIApplication {
+	assigned_booth: string | null;
+	status: string;
+	user: APIUserProfile;
+}
+
 interface APIEventPrivatePageResponse {
 	event_name: string;
 	event_description: string | null;
@@ -76,6 +88,7 @@ interface APIEventPrivatePageResponse {
 	event_days: APIEventDay[];
 	event_map_url: string | null;
 	event_map_data_url: string | null;
+	all_applications: APIApplication[];
 }
 
 interface RetEventDay {
@@ -98,6 +111,7 @@ interface ManageEventReturnBody {
 		displayMapUrl: string | null;
 		boothData: any | null;
 	};
+	applications: APIApplication[];
 }
 
 interface UpdateEventReturnBody {
@@ -186,7 +200,8 @@ export const load: PageServerLoad = async (event) => {
 		map: {
 			displayMapUrl: eventData.event_map_url,
 			boothData: fetchedBoothData
-		}
+		},
+		applications: eventData.all_applications
 	};
 
 	return body;
@@ -371,5 +386,32 @@ export const actions = {
 			success: true,
 			message: 'Event is now public.'
 		};
+	},
+
+	assignBooth: async (event) => {
+		await verifyAuth(event);
+		const formData = await event.request.formData();
+
+		const username = formData.get('username') as string;
+		const assignedBooth = formData.get('assignedBooth') as string;
+
+		if (!username || !assignedBooth) {
+			return fail(400, { message: 'Username and Booth selection are required.' });
+		}
+
+		const reqPayload = { username, assigned_booth: assignedBooth };
+
+		const res = await event.fetch(`/api/events/assign/${event.params.event_name}`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(reqPayload)
+		});
+
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			return fail(res.status, { message: errorData.detail || 'Failed to assign booth.' });
+		}
+
+		return { success: true, message: 'Booth successfully assigned!' };
 	}
 } satisfies Actions;

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import MdiGeneral from 'virtual:icons/mdi/information';
 	import MdiMap from 'virtual:icons/mdi/map';
+	import MdiAccountMultiple from 'virtual:icons/mdi/account-multiple';
 
 	import { Tabs } from 'melt/builders';
 	import type { ActionData, PageServerData } from './$types';
@@ -10,6 +11,8 @@
 	import { addToast } from '$lib/components/Toaster.svelte';
 	import EventMapManager from '$lib/components/EventMapManager.svelte';
 	import { enhance } from '$app/forms';
+	import CardItem from '$lib/components/CardItem.svelte';
+	import { resolve } from '$app/paths';
 
 	const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
@@ -26,6 +29,21 @@
 		orientation: 'vertical',
 		onValueChange: clearMessage
 	});
+
+	// Booths
+	let availableBooths = $derived.by(() => {
+		if (!data.map.boothData) return [];
+
+		const allBooths = Object.keys(data.map.boothData);
+		const takenBooths = data.applications
+			.filter((app) => app.status === 'ACCEPTED' && app.assigned_booth)
+			.map((app) => app.assigned_booth as string);
+
+		return allBooths.filter((booth) => !takenBooths.includes(booth)).toSorted();
+	});
+
+	let pendingApps = $derived(data.applications.filter((app) => app.status === 'PENDING'));
+	let acceptedApps = $derived(data.applications.filter((app) => app.status === 'ACCEPTED'));
 
 	function clearMessage() {
 		if (!form) return;
@@ -61,6 +79,8 @@
 		<MdiGeneral />
 	{:else if tab === 'Event Map'}
 		<MdiMap />
+	{:else if tab === 'Event Applications'}
+		<MdiAccountMultiple />
 	{/if}
 {/snippet}
 
@@ -135,6 +155,106 @@
 	/>
 {/snippet}
 
+{#snippet eventApplicationsTab()}
+	<div class="space-y-4">
+		<div class="space-y-4 rounded-lg bg-gray1 p-6 shadow-md">
+			<h2 class="text-xl font-bold">
+				Pending Applications ({pendingApps.length})
+			</h2>
+
+			<span class="flex w-full items-center justify-center">
+				<hr class="w-full border border-fg/50" />
+			</span>
+
+			{#if pendingApps.length === 0}
+				<p class="text-fg/70 italic">No pending applications.</p>
+			{:else}
+				<div class="space-y-4">
+					{#each pendingApps as app}
+						<CardItem
+							type="USER"
+							title={app.user.user_display_name}
+							subtitle={app.user.username}
+							imgSrc={app.user.pfp_url}
+							clickLink={resolve(`/users/${app.user.username}`)}
+						>
+							{#snippet actionItems()}
+								<form
+									method="post"
+									action="?/assignBooth"
+									class="flex gap-2"
+									use:enhance={() => {
+										return async ({ update }) => {
+											await update();
+										};
+									}}
+								>
+									<input
+										type="hidden"
+										name="username"
+										value={app.user.username}
+									/>
+									<select
+										name="assignedBooth"
+										required
+										class="rounded border border-fg/20 bg-bg px-3 py-2 pr-8 outline-none focus:border-primary"
+									>
+										<option value="" disabled selected>Select Booth...</option>
+										{#each availableBooths as booth}
+											<option value={booth}>{booth}</option>
+										{/each}
+									</select>
+									<button
+										type="submit"
+										class="w-max rounded bg-primary px-4 py-2 font-bold text-bg transition hover:bg-primary-hover disabled:opacity-50"
+										disabled={availableBooths.length === 0}
+									>
+										Assign & Accept
+									</button>
+								</form>
+							{/snippet}
+						</CardItem>
+					{/each}
+				</div>
+			{/if}
+		</div>
+
+		<div class="space-y-4 rounded-lg bg-gray1 p-6 shadow-md">
+			<h2 class="text-xl font-bold">
+				Assigned Booths ({acceptedApps.length})
+			</h2>
+
+			<span class="flex w-full items-center justify-center">
+				<hr class="w-full border border-fg/50" />
+			</span>
+
+			{#if acceptedApps.length === 0}
+				<p class="text-fg/70 italic">No booths assigned yet.</p>
+			{:else}
+				<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+					{#each acceptedApps as app}
+						<CardItem
+							type="USER"
+							title={app.user.user_display_name}
+							subtitle={app.user.username}
+							imgSrc={app.user.pfp_url}
+							clickLink={resolve(`/users/${app.user.username}`)}
+						>
+							{#snippet actionItems()}
+								<div
+									class="rounded bg-primary/20 px-3 py-1 font-bold whitespace-nowrap text-primary"
+								>
+									Booth {app.assigned_booth}
+								</div>
+							{/snippet}
+						</CardItem>
+					{/each}
+				</div>
+			{/if}
+		</div>
+	</div>
+{/snippet}
+
 <div class="p-8">
 	<div class="space-y-2">
 		<div class="text-2xl">@{page.params.org_name}</div>
@@ -175,6 +295,8 @@
 						{@render generalInformationTab()}
 					{:else if t === 'Event Map'}
 						{@render eventMapTab()}
+					{:else if t === 'Event Applications'}
+						{@render eventApplicationsTab()}
 					{:else}
 						{t} Contents
 					{/if}

@@ -53,7 +53,7 @@
 {/snippet}
 
 <div
-	class="carditem flex items-center gap-x-4 rounded-lg bg-gray1 px-4 py-2"
+	class="carditem flex items-center gap-x-4 rounded-lg bg-gray1 px-4 py-2 shadow-md"
 	class:bg-gray2={hovered}
 >
 	<div class="w-full">

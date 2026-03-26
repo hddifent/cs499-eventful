@@ -5,6 +5,8 @@
 	import MdiCalendar from 'virtual:icons/mdi/calendar';
 	import MdiClock from 'virtual:icons/mdi/clock-outline';
 	import MdiInformation from 'virtual:icons/mdi/information-outline';
+	import CardItem from '$lib/components/CardItem.svelte';
+	import { resolve } from '$app/paths';
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 
@@ -51,25 +53,13 @@
 			</span>
 
 			{#if selectedBooth.user}
-				<div class="flex items-center gap-4">
-					{#if selectedBooth.user.pfp_url}
-						<img
-							src={selectedBooth.user.pfp_url}
-							alt="Profile"
-							class="h-16 w-16 rounded-full object-cover shadow-sm"
-						/>
-					{:else}
-						<div
-							class="flex h-16 w-16 items-center justify-center rounded-full bg-bg text-xl font-bold text-fg/50 shadow-sm"
-						>
-							{selectedBooth.user.user_display_name.charAt(0).toUpperCase()}
-						</div>
-					{/if}
-					<div>
-						<div class="text-lg font-bold">{selectedBooth.user.user_display_name}</div>
-						<div class="text-sm text-fg/60">@{selectedBooth.user.username}</div>
-					</div>
-				</div>
+				<CardItem
+					type="USER"
+					title={selectedBooth.user.user_display_name}
+					subtitle={selectedBooth.user.username}
+					imgSrc={selectedBooth.user.pfp_url}
+					clickLink={resolve(`/users/${selectedBooth.user.username}`)}
+				/>
 			{:else}
 				<div class="text-fg/80 italic">This booth is unoccupied.</div>
 			{/if}
@@ -168,16 +158,30 @@
 				</ul>
 			</div>
 
-			<div class="rounded-lg border-2 border-primary/20 bg-gray1 p-6 text-center shadow-md">
-				<h3 class="mb-2 text-xl font-bold">Want to participate?</h3>
+			<div class="space-y-4 rounded-lg bg-gray1 p-6 text-center shadow-md">
+				<h3 class="text-xl font-bold">Want to participate?</h3>
 
-				<div class="mb-6 rounded bg-bg p-3 text-sm text-fg/80">
+				<div class="rounded bg-bg p-4 text-sm text-fg/80">
 					<span class="block font-bold">Application Window:</span>
 					{appStart.toLocaleDateString()}
 					{appStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
 					-
 					{appEnd.toLocaleDateString()}
 					{appEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+				</div>
+
+				<div>
+					<a
+						href={data.event.event_application_info}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="w-full rounded-lg px-4 py-2 font-bold shadow-md transition
+							{isAppOpen
+							? 'bg-primary text-bg hover:bg-primary-hover'
+							: 'cursor-not-allowed bg-gray-400 text-gray-700'}"
+					>
+						Application Link
+					</a>
 				</div>
 
 				<form
@@ -191,7 +195,7 @@
 				>
 					<button
 						type="submit"
-						class="w-full rounded-lg px-8 py-3 font-bold shadow-md transition
+						class="w-full rounded-lg px-4 py-2 font-bold shadow-md transition
 								{isAppOpen
 							? 'bg-primary text-bg hover:bg-primary/90'
 							: 'cursor-not-allowed bg-gray-400 text-gray-700'}"
