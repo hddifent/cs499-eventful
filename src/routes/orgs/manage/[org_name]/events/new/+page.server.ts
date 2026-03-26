@@ -13,13 +13,14 @@ const createEventSchema = z
 			.min(1, 'Location must not be empty.')
 			.max(256, 'Location must not exceed 256 chracters.'),
 		eventApplicationLink: z.url('Must be a valid URL.'),
-		applicationPeriodStart: z.coerce.date(),
-		applicationPeriodEnd: z.coerce.date(),
+		applicationPeriodStart: z.coerce.date('Invalid date.'),
+		applicationPeriodEnd: z.coerce.date('Invalid date.'),
 		eventDays: z
 			.array(
 				z.object({
 					start: z.coerce.date(),
-					end: z.coerce.date()
+					end: z.coerce.date(),
+					timezone: z.string().min(1)
 				})
 			)
 			.min(1, 'At least one event day is required.')
@@ -94,6 +95,8 @@ export const actions = {
 		await verifyAuth(event);
 		const formData = await event.request.formData();
 
+		const clientTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 		const rawData: Record<string, unknown> = {
 			eventName: formData.get('eventName'),
 			eventDesc: formData.get('eventDesc'),
@@ -103,18 +106,21 @@ export const actions = {
 			applicationPeriodEnd: formData.get('applicationPeriodEnd'),
 			eventDays: []
 		};
-		const days: { start: unknown; end: unknown }[] = [];
+		const days: { start: unknown; end: unknown; timezone: string }[] = [];
 		let i = 0;
 		while (formData.has(`eventDay_${i}Start`)) {
 			days.push({
 				start: formData.get(`eventDay_${i}Start`),
-				end: formData.get(`eventDay_${i}End`)
+				end: formData.get(`eventDay_${i}End`),
+				timezone: clientTimezone
 			});
 			i++;
 		}
 		rawData.eventDays = days;
 
-		const validationResult = createEventSchema.safeParse(formData);
+		console.log(rawData);
+
+		const validationResult = createEventSchema.safeParse(rawData);
 		if (!validationResult.success) {
 			const fieldErrors = z.flattenError(validationResult.error);
 			const body: CreateEventReturnBody = {
@@ -123,15 +129,16 @@ export const actions = {
 					eventName: rawData.eventName as string,
 					eventDesc: rawData.eventDesc as string,
 					eventLoc: rawData.eventLoc as string,
-					eventApplicationLink: rawData.eventLoc as string,
-					applicationPeriodStart: rawData.eventLoc as Date,
-					applicationPeriodEnd: rawData.eventLoc as Date,
-					eventDays: rawData.eventLoc as {
+					eventApplicationLink: rawData.eventApplicationLink as string,
+					applicationPeriodStart: rawData.applicationPeriodStart as Date,
+					applicationPeriodEnd: rawData.applicationPeriodEnd as Date,
+					eventDays: rawData.eventDays as {
 						start: Date;
 						end: Date;
 					}[]
 				}
 			};
+			console.log(body);
 			return fail(400, body);
 		}
 
@@ -146,6 +153,7 @@ export const actions = {
 		} = validationResult.data;
 
 		const reqPayload = {
+			org_unique_name: event.params.org_name,
 			event_name: eventName,
 			event_desc: eventDesc,
 			event_loc: eventLoc,
