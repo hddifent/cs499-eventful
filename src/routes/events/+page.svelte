@@ -10,9 +10,12 @@
 	import MdiSort from 'virtual:icons/mdi/sort-ascending';
 
 	import { Dialog } from 'melt/builders';
+	import type { PageData } from './$types';
+	import CardSquare from '$lib/components/CardSquare.svelte';
+	import { resolve } from '$app/paths';
 
 	// Loaded data from API
-	// const { data }: { data: PageData } = $props();
+	const { data }: { data: PageData } = $props();
 
 	// Dialog Setups
 	const filterDialog = new Dialog({ closeOnOutsideClick: false });
@@ -66,7 +69,16 @@
 
 		<!-- Events Display -->
 		<GridDisplay>
-			<div>To do next...</div>
+			{#each data.events as event (event.event_slug)}
+				<CardSquare
+					data={[
+						{ text: event.event_name, importance: 'title' },
+						{ text: event.event_location, importance: 'subtitle' },
+						{ text: event.event_description, importance: 'description' }
+					]}
+					clickLink={resolve(`/events/${event.event_slug}`)}
+				/>
+			{/each}
 		</GridDisplay>
 	</div>
 </div>

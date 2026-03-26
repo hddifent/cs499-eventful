@@ -6,6 +6,7 @@ interface PublicEventResponse {
 	event_name: string;
 	event_description: string;
 	event_location: string;
+	event_application_info: string;
 	event_application_accept_start: string;
 	event_application_accept_end: string;
 	event_map_url: string | null;

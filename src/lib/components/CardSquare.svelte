@@ -6,9 +6,9 @@
 	type DataImportance = 'title' | 'subtitle' | 'description';
 
 	const textClass: Record<DataImportance, string> = {
-		title: 'font-black',
-		subtitle: 'text-secondary text-sm',
-		description: 'text-fg/80 text-sm'
+		title: 'font-black truncate',
+		subtitle: 'text-secondary font-bold text-sm line-clamp-2',
+		description: 'text-fg/80 text-sm line-clamp-3'
 	};
 
 	interface DisplayData {
@@ -18,10 +18,11 @@
 
 	interface CardData {
 		imgSrc?: string;
+		clickLink?: string;
 		data?: DisplayData[];
 	}
 
-	let { imgSrc = '', data = [] }: CardData = $props();
+	let { imgSrc = '', clickLink, data = [] }: CardData = $props();
 
 	const avatar = new Avatar({ src: () => imgSrc });
 </script>
@@ -48,5 +49,11 @@
 {/snippet}
 
 <div class="rounded-lg">
-	{@render card()}
+	{#if clickLink}
+		<a href={clickLink}>
+			{@render card()}
+		</a>
+	{:else}
+		{@render card()}
+	{/if}
 </div>
