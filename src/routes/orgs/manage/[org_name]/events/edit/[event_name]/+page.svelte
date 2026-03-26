@@ -8,6 +8,7 @@
 	import EventInfoForm from '$lib/components/EventInfoForm.svelte';
 	import Toaster from '$lib/components/Toaster.svelte';
 	import { addToast } from '$lib/components/Toaster.svelte';
+	import EventMapManager from '$lib/components/EventMapManager.svelte';
 
 	const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
@@ -21,8 +22,14 @@
 	type TabId = (typeof tabNames)[number];
 	const orgManageTabs = new Tabs<TabId>({
 		value: tabNames[0],
-		orientation: 'vertical'
+		orientation: 'vertical',
+		onValueChange: clearMessage
 	});
+
+	function clearMessage() {
+		if (!form) return;
+		form.message = '';
+	}
 
 	function isMenuDisabled(tab: TabId): boolean {
 		const publicFirst: TabId[] = ['Event Applications', 'Booth Management'];
@@ -59,7 +66,7 @@
 {#snippet generalInformationTab()}
 	<div class="space-y-4 rounded-lg bg-gray1 p-6 shadow-md">
 		<div class="flex items-center justify-between">
-			<h2 class="text-xl font-bold">Basic Information</h2>
+			<div class="text-xl font-bold">Basic Information</div>
 			<span
 				class="rounded-full px-3 py-1 text-sm {data.general.eventStatus === 'PUBLIC'
 					? 'bg-primary'
@@ -96,6 +103,14 @@
 			/>
 		{/key}
 	</div>
+{/snippet}
+
+{#snippet eventMapTab()}
+	<EventMapManager
+		action="?/updateEventMap"
+		initialDisplayMapUrl={data.map.displayMapUrl}
+		initialBoothData={data.map.boothData}
+	/>
 {/snippet}
 
 <div class="p-8">
@@ -136,6 +151,8 @@
 				<div {...orgManageTabs.getContent(t)}>
 					{#if t === 'General Information'}
 						{@render generalInformationTab()}
+					{:else if t === 'Event Map'}
+						{@render eventMapTab()}
 					{:else}
 						{t} Contents
 					{/if}

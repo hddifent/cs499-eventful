@@ -7,6 +7,7 @@
 	import { FileUpload } from 'melt/builders';
 
 	interface FileUploadData {
+		name?: string;
 		maxFileSize?: number;
 		label?: Snippet;
 		dropzoneIcon?: Snippet;
@@ -16,6 +17,7 @@
 	}
 
 	let {
+		name,
 		maxFileSize = $bindable(5 * 1024 * 1024), // 5 MB
 		label,
 		dropzoneIcon,
@@ -64,7 +66,7 @@
 	{@render (label ?? defaultLabel)()}
 
 	<!-- Dropzone -->
-	<input {...fileUpload.input} />
+	<input {...fileUpload.input} {name} />
 	<div
 		{...fileUpload.dropzone}
 		class="flex w-3/4 max-w-xl flex-col items-center justify-center gap-y-2 rounded-lg border-4 border-dotted border-primary/50 bg-gray1 py-16 text-fg/50 hover:cursor-pointer"

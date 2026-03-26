@@ -74,6 +74,8 @@ interface APIEventPrivatePageResponse {
 	event_application_accept_end: string | null;
 	event_publication_status: EventStatus;
 	event_days: APIEventDay[];
+	event_map_url: string | null;
+	event_map_data_url: string | null;
 }
 
 interface RetEventDay {
@@ -91,6 +93,10 @@ interface ManageEventReturnBody {
 		applicationPeriodEnd: Date;
 		eventDays: RetEventDay[];
 		eventStatus: EventStatus;
+	};
+	map: {
+		displayMapUrl: string | null;
+		boothData: any | null;
 	};
 }
 
@@ -150,6 +156,18 @@ export const load: PageServerLoad = async (event) => {
 
 	const eventData = (await res.json()) as APIEventPrivatePageResponse;
 
+	let fetchedBoothData = null;
+	if (eventData.event_map_data_url) {
+		try {
+			const dataRes = await fetch(eventData.event_map_data_url);
+			if (dataRes.ok) {
+				fetchedBoothData = await dataRes.json();
+			}
+		} catch (e) {
+			console.error('Failed to load booth data JSON from storage:', e);
+		}
+	}
+
 	const body: ManageEventReturnBody = {
 		general: {
 			eventName: eventData.event_name,
@@ -164,6 +182,10 @@ export const load: PageServerLoad = async (event) => {
 				: new Date(Date.now() + 86400000),
 			eventDays: _apiEventDaysToFrontendDays(eventData.event_days),
 			eventStatus: eventData.event_publication_status
+		},
+		map: {
+			displayMapUrl: eventData.event_map_url,
+			boothData: fetchedBoothData
 		}
 	};
 
@@ -274,6 +296,59 @@ export const actions = {
 				applicationPeriodEnd,
 				eventDays
 			}
+		};
+	},
+
+	updateEventMap: async (event) => {
+		await verifyAuth(event);
+		const formData = await event.request.formData();
+
+		const displayMap = formData.get('displayMap') as File | null;
+		const boothData = formData.get('boothData') as string | null;
+
+		if (!displayMap || displayMap.size === 0) {
+			const body: UpdateEventReturnBody = {
+				message: 'Display map image is required.'
+			};
+			return fail(400, body);
+		}
+		if (!boothData) {
+			const body: UpdateEventReturnBody = {
+				message: 'Booth mapping data is missing. Please process the map first.'
+			};
+			return fail(400, body);
+		}
+
+		try {
+			JSON.parse(boothData);
+		} catch {
+			const body: UpdateEventReturnBody = {
+				message: 'Invalid booth mapping data format.'
+			};
+			return fail(400, body);
+		}
+
+		const reqPayload = new FormData();
+		reqPayload.append('file', displayMap);
+		reqPayload.append('data', boothData);
+		reqPayload.append('org_unique_name', event.params.org_name);
+
+		const res = await event.fetch(`/api/events/map/${event.params.event_name}`, {
+			method: 'PATCH',
+			body: reqPayload
+		});
+
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			console.log(errorData.detail[0].loc);
+			const body: UpdateEventReturnBody = {
+				message: errorData.detail || res.statusText
+			};
+			return fail(res.status, body);
+		}
+
+		return {
+			success: true
 		};
 	}
 } satisfies Actions;
