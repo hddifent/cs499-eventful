@@ -21,6 +21,13 @@ interface APIMember {
 	user: APIUser;
 }
 
+interface APIOrgEvent {
+	event_name: string;
+	event_slug: string;
+	event_publication_status: 'DRAFT' | 'PUBLIC';
+	event_application_accept_start: string | null;
+}
+
 interface APIResponse {
 	org_unique_name: string;
 	org_display_name: string;
@@ -28,12 +35,20 @@ interface APIResponse {
 
 	head_user: APIUser;
 	org_members: APIMember[];
+	org_events: APIOrgEvent[];
 }
 
 interface RetUser {
 	username: string;
 	displayName: string;
 	pfpUrl?: string;
+}
+
+interface OrgEventData {
+	eventName: string;
+	eventSlug: string;
+	status: 'DRAFT' | 'PUBLIC';
+	startDate: Date | null;
 }
 
 interface OrgManageReturnBody {
@@ -47,6 +62,7 @@ interface OrgManageReturnBody {
 		joined: RetUser[];
 		invited: RetUser[];
 	};
+	events: OrgEventData[];
 }
 
 interface InviteReturnBody {
@@ -80,6 +96,22 @@ export const load: PageServerLoad = async ({ fetch, cookies, params }) => {
 
 	if (res.ok) {
 		const data = (await res.json()) as APIResponse;
+
+		const mappedEvents: OrgEventData[] = (data.org_events || []).map((e) => ({
+			eventName: e.event_name,
+			eventSlug: e.event_slug,
+			status: e.event_publication_status,
+			startDate: e.event_application_accept_start
+				? new Date(e.event_application_accept_start)
+				: null
+		}));
+
+		mappedEvents.sort((a, b) => {
+			if (a.status !== b.status) return a.status === 'DRAFT' ? -1 : 1;
+			if (!a.startDate || !b.startDate) return 0;
+			return b.startDate.getTime() - a.startDate.getTime();
+		});
+
 		const body: OrgManageReturnBody = {
 			org: {
 				headUser: {
@@ -93,7 +125,8 @@ export const load: PageServerLoad = async ({ fetch, cookies, params }) => {
 			members: {
 				joined: _apiMemberToUserList(data.org_members, 'JOINED'),
 				invited: _apiMemberToUserList(data.org_members, 'INVITED')
-			}
+			},
+			events: mappedEvents
 		};
 		return body;
 	}

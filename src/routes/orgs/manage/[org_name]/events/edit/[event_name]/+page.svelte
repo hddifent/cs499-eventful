@@ -17,12 +17,7 @@
 	const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
 	// Tabs
-	const tabNames = [
-		'General Information',
-		'Event Map',
-		'Event Applications',
-		'Booth Management'
-	] as const;
+	const tabNames = ['General Information', 'Event Map', 'Event Applications'] as const;
 	type TabId = (typeof tabNames)[number];
 	const orgManageTabs = new Tabs<TabId>({
 		value: tabNames[0],
@@ -51,7 +46,7 @@
 	}
 
 	function isMenuDisabled(tab: TabId): boolean {
-		const publicFirst: TabId[] = ['Event Applications', 'Booth Management'];
+		const publicFirst: TabId[] = ['Event Applications'];
 		if (data.general.eventStatus === 'DRAFT') {
 			return publicFirst.includes(tab);
 		}

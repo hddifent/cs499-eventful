@@ -1,6 +1,6 @@
 <script lang="ts">
-	import MdiGeneral from 'virtual:icons/mdi/information';
 	import MdiGroup from 'virtual:icons/mdi/account-group';
+	import MdiEvent from 'virtual:icons/mdi/calendar';
 
 	import MdiUserAdd from 'virtual:icons/mdi/account-plus';
 	import MdiUser from 'virtual:icons/mdi/account';
@@ -12,11 +12,12 @@
 	import { resolve } from '$app/paths';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { enhance } from '$app/forms';
+	import { page } from '$app/state';
 
 	const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
 	// Tabs
-	const tabNames = ['General', 'Group Members'] as const;
+	const tabNames = ['Group Members', 'Organized Events'] as const;
 	type TabId = (typeof tabNames)[number];
 	const orgManageTabs = new Tabs<TabId>({
 		value: tabNames[0],
@@ -82,10 +83,10 @@
 </script>
 
 {#snippet tabIcon(tab: TabId)}
-	{#if tab === 'General'}
-		<MdiGeneral />
-	{:else if tab === 'Group Members'}
+	{#if tab === 'Group Members'}
 		<MdiGroup />
+	{:else if tab === 'Organized Events'}
+		<MdiEvent />
 	{/if}
 {/snippet}
 
@@ -137,6 +138,50 @@
 	</div>
 {/snippet}
 
+{#snippet eventsContent()}
+	<div class="space-y-2">
+		<a
+			href={resolve(`/orgs/manage/${page.params.org_name}/events/new`)}
+			class="flex w-fit items-center gap-x-2 rounded-lg bg-primary px-4 py-2 hover:bg-primary-hover"
+		>
+			<MdiEvent /> Create a new event
+		</a>
+
+		<span class="flex w-full items-center justify-center py-2">
+			<hr class="w-full border border-fg/50" />
+		</span>
+
+		<div class="text-2xl font-bold">Organized Events ({data.events.length})</div>
+
+		{#if data.events.length > 0}
+			<div class="space-y-4">
+				{#each data.events as e (e.eventSlug)}
+					<CardItem
+						type="ITEM"
+						title={e.eventName}
+						subtitle={e.eventSlug}
+						clickLink={resolve(
+							`/orgs/manage/${page.params.org_name}/events/edit/${e.eventSlug}`
+						)}
+					>
+						{#snippet actionItems()}
+							<div
+								class="rounded px-3 py-1 text-sm {e.status === 'PUBLIC'
+									? 'bg-primary'
+									: 'bg-gray2'}"
+							>
+								{e.status}
+							</div>
+						{/snippet}
+					</CardItem>
+				{/each}
+			</div>
+		{:else}
+			<div>None</div>
+		{/if}
+	</div>
+{/snippet}
+
 <div class="p-8">
 	<!-- Flex User Profile -->
 	<UserBanner
@@ -174,12 +219,10 @@
 		<div class="w-full">
 			{#each tabNames as t (t)}
 				<div {...orgManageTabs.getContent(t)}>
-					{#if t === 'General'}
-						<!-- {@render orgGroupContent()} -->
-					{:else if t === 'Group Members'}
+					{#if t === 'Group Members'}
 						{@render membersContent()}
-					{:else}
-						{t} Contents
+					{:else if t === 'Organized Events'}
+						{@render eventsContent()}
 					{/if}
 				</div>
 			{/each}
