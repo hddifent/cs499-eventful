@@ -2,7 +2,6 @@
 	import type { Snippet } from 'svelte';
 	import type { FullAutoFill } from 'svelte/elements';
 	import DateInput from 'date-picker-svelte/DateInput.svelte';
-	import { SvelteDate } from 'svelte/reactivity';
 
 	interface FormInputBoxData {
 		name: string;
@@ -22,8 +21,39 @@
 		errorMessage
 	}: FormInputBoxData = $props();
 
-	const minDate = new SvelteDate();
-	const maxDate = new SvelteDate();
+	const oneDayLaterInMs = 24 * 60 * 60 * 1000;
+
+	// Svelte 5 -> 4 hack
+	let localStart = $state(valueStart instanceof Date ? valueStart : new Date());
+	let localEnd = $state(
+		valueEnd instanceof Date ? valueEnd : new Date(Date.now() + oneDayLaterInMs)
+	);
+
+	$effect(() => {
+		valueStart = localStart;
+		valueEnd = localEnd;
+	});
+
+	$effect(() => {
+		if (valueStart) {
+			const incomingStart = valueStart instanceof Date ? valueStart : new Date(valueStart);
+
+			if (incomingStart.getTime() !== localStart.getTime()) {
+				localStart = incomingStart;
+			}
+		}
+
+		if (valueEnd) {
+			const incomingEnd = valueEnd instanceof Date ? valueEnd : new Date(valueEnd);
+
+			if (incomingEnd.getTime() !== localEnd.getTime()) {
+				localEnd = incomingEnd;
+			}
+		}
+	});
+
+	const minDate = new Date();
+	const maxDate = new Date();
 	maxDate.setFullYear(maxDate.getFullYear() + 1);
 </script>
 
@@ -34,17 +64,17 @@
 		</div>
 	</label>
 
-	<input name="{name}Start" type="datetime" {autocomplete} bind:value={valueStart} hidden />
-	<input name="{name}End" type="datetime" {autocomplete} bind:value={valueEnd} hidden />
+	<input name="{name}Start" {autocomplete} value={localStart.toISOString()} hidden />
+	<input name="{name}End" {autocomplete} value={localEnd.toISOString()} hidden />
 
 	<div class="flex w-full items-center gap-4">
 		<div class="flex flex-1 items-center gap-2">
 			<span class="w-12 shrink-0">Start</span>
 			<div class="w-full">
 				<DateInput
-					bind:value={valueStart}
+					bind:value={localStart}
 					min={minDate}
-					max={valueEnd ?? maxDate}
+					max={localEnd}
 					timePrecision="minute"
 					placeholder=""
 					format="dd/MM/yyyy HH:mm"
@@ -57,8 +87,8 @@
 			<span class="w-12 shrink-0">End</span>
 			<div class="w-full">
 				<DateInput
-					bind:value={valueEnd}
-					min={valueStart ?? minDate}
+					bind:value={localEnd}
+					min={localStart}
 					max={maxDate}
 					timePrecision="minute"
 					placeholder=""

@@ -22,7 +22,6 @@
 	import SimpleFormTextArea from '$lib/components/SimpleFormTextArea.svelte';
 	import SimpleFormDateRange from '$lib/components/SimpleFormDateRange.svelte';
 	import SimpleFormCompundDateTimeRange from '$lib/components/SimpleFormCompundDateTimeRange.svelte';
-	import { SvelteDate } from 'svelte/reactivity';
 
 	let { form }: { form: ActionData } = $props();
 
@@ -33,16 +32,16 @@
 	let eventDays = $state([
 		{
 			id: crypto.randomUUID(),
-			valueStart: new SvelteDate(),
-			valueEnd: new SvelteDate(Date.now() + oneHoursInMs)
+			valueStart: new Date(),
+			valueEnd: new Date(Date.now() + oneHoursInMs)
 		}
 	]);
 
 	const addEventDay = () => {
 		eventDays.push({
 			id: crypto.randomUUID(),
-			valueStart: new SvelteDate(),
-			valueEnd: new SvelteDate(Date.now() + oneHoursInMs)
+			valueStart: new Date(),
+			valueEnd: new Date(Date.now() + oneHoursInMs)
 		});
 	};
 

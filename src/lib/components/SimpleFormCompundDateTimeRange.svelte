@@ -1,8 +1,7 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
 	import type { FullAutoFill } from 'svelte/elements';
 	import DateInput from 'date-picker-svelte/DateInput.svelte';
-	import { SvelteDate } from 'svelte/reactivity';
 
 	interface FormInputBoxData {
 		name: string;
@@ -17,61 +16,98 @@
 		name,
 		inputLabel,
 		autocomplete = 'off',
-		valueStart = $bindable(new SvelteDate()),
-		valueEnd = $bindable(new SvelteDate(Date.now() + 60 * 60 * 1000)),
+		valueStart = $bindable(),
+		valueEnd = $bindable(),
 		errorMessage
 	}: FormInputBoxData = $props();
 
-	let baseDate = new SvelteDate(valueStart.getTime());
+	const oneHourLater = 60 * 60 * 1000;
+
+	// Svelte 5 -> 4 hack
+	let localStart = $state(valueStart instanceof Date ? valueStart : new Date());
+	let localEnd = $state(
+		valueEnd instanceof Date ? valueEnd : new Date(Date.now() + oneHourLater)
+	);
+
+	let baseDate = $state(new Date(localStart.getTime()));
 
 	function toTimeString(d: Date): string {
 		return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 	}
 
-	let startTimeStr = $state(toTimeString(valueStart));
-	let endTimeStr = $state(toTimeString(valueEnd));
+	let startTimeStr = $state(toTimeString(localStart));
+	let endTimeStr = $state(toTimeString(localEnd));
 
+	// 1. SYNC OUT
 	$effect(() => {
+		// Track the local variables OUTSIDE untrack
+		const start = localStart;
+		const end = localEnd;
+
+		untrack(() => {
+			valueStart = start;
+			valueEnd = end;
+		});
+	});
+
+	// 2. COMPUTE
+	$effect(() => {
+		// Track base inputs OUTSIDE untrack
 		const year = baseDate.getFullYear();
 		const month = baseDate.getMonth();
 		const date = baseDate.getDate();
+		const startStr = startTimeStr;
+		const endStr = endTimeStr;
 
-		if (
-			valueStart.getFullYear() !== year ||
-			valueStart.getMonth() !== month ||
-			valueStart.getDate() !== date
-		) {
-			valueStart.setFullYear(year, month, date);
-		}
-		if (
-			valueEnd.getFullYear() !== year ||
-			valueEnd.getMonth() !== month ||
-			valueEnd.getDate() !== date
-		) {
-			valueEnd.setFullYear(year, month, date);
-		}
-	});
+		untrack(() => {
+			if (startStr) {
+				const [h, m] = startStr.split(':').map(Number);
+				const newStart = new Date(year, month, date, h, m, 0, 0);
 
-	$effect(() => {
-		if (startTimeStr) {
-			const [hours, minutes] = startTimeStr.split(':').map(Number);
-			if (valueStart.getHours() !== hours || valueStart.getMinutes() !== minutes) {
-				valueStart.setHours(hours, minutes, 0, 0);
+				// Because we are inside untrack, reading localStart.getTime() here
+				// will NOT cause Svelte to loop when we write to localStart.
+				if (localStart.getTime() !== newStart.getTime()) {
+					localStart = newStart;
+				}
 			}
-		}
-	});
 
-	$effect(() => {
-		if (endTimeStr) {
-			const [hours, minutes] = endTimeStr.split(':').map(Number);
-			if (valueEnd.getHours() !== hours || valueEnd.getMinutes() !== minutes) {
-				valueEnd.setHours(hours, minutes, 0, 0);
+			if (endStr) {
+				const [h, m] = endStr.split(':').map(Number);
+				const newEnd = new Date(year, month, date, h, m, 0, 0);
+				if (localEnd.getTime() !== newEnd.getTime()) {
+					localEnd = newEnd;
+				}
 			}
-		}
+		});
 	});
 
-	const minDate = new SvelteDate();
-	const maxDate = new SvelteDate();
+	// 3. SYNC IN
+	$effect(() => {
+		// Track the parent variables OUTSIDE untrack
+		const vStart = valueStart;
+		const vEnd = valueEnd;
+
+		untrack(() => {
+			if (vStart) {
+				const parsed = vStart instanceof Date ? vStart : new Date(vStart);
+				if (parsed.getTime() !== localStart.getTime()) {
+					localStart = parsed;
+					baseDate = new Date(parsed.getTime());
+					startTimeStr = toTimeString(parsed);
+				}
+			}
+			if (vEnd) {
+				const parsed = vEnd instanceof Date ? vEnd : new Date(vEnd);
+				if (parsed.getTime() !== localEnd.getTime()) {
+					localEnd = parsed;
+					endTimeStr = toTimeString(parsed);
+				}
+			}
+		});
+	});
+
+	const minDate = new Date();
+	const maxDate = new Date();
 	maxDate.setFullYear(maxDate.getFullYear() + 1);
 
 	const nativeInputClasses =
@@ -85,8 +121,8 @@
 		</div>
 	</label>
 
-	<input name="{name}Start" type="datetime" {autocomplete} bind:value={valueStart} hidden />
-	<input name="{name}End" type="datetime" {autocomplete} bind:value={valueEnd} hidden />
+	<input name="{name}Start" {autocomplete} value={localStart.toISOString()} hidden />
+	<input name="{name}End" {autocomplete} value={localEnd.toISOString()} hidden />
 
 	<div class="flex w-full items-center gap-4">
 		<div class="flex flex-1 items-center gap-2">
