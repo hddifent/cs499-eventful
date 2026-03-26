@@ -135,7 +135,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions = {
-	default: async (event) => {
+	respondInvite: async (event) => {
 		await verifyAuth(event);
 
 		const formData = Object.fromEntries(await event.request.formData());
@@ -170,5 +170,40 @@ export const actions = {
 			success: true
 		};
 		return body;
+	},
+
+	uploadPfp: async (event) => {
+		await verifyAuth(event);
+
+		const formData = await event.request.formData();
+		const file = formData.get('file') as File | null;
+
+		if (!file || file.size === 0) {
+			return fail(400, {
+				pfpSuccess: false,
+				pfpMessage: 'Please select a valid image file.'
+			});
+		}
+
+		const reqPayload = new FormData();
+		reqPayload.append('file', file);
+
+		const res = await event.fetch('/api/users/media/profilepic', {
+			method: 'POST',
+			body: reqPayload
+		});
+
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			return fail(res.status, {
+				pfpSuccess: false,
+				pfpMessage: errorData.detail || 'Failed to upload profile picture.'
+			});
+		}
+
+		return {
+			pfpSuccess: true,
+			pfpMessage: 'Profile picture updated successfully!'
+		};
 	}
 } satisfies Actions;

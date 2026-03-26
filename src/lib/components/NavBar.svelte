@@ -66,12 +66,13 @@
 		<div class="flex min-w-1/8 items-center justify-end gap-4 text-bg">
 			{#if isLoggedIn}
 				<!-- Logged IN -->
-				<button onclick={handleShoppingListClick} class="py-2 text-2xl"><MdiList /></button>
-
 				<button {...userMenu.trigger} class="h-10 w-10 rounded-full bg-secondary">
-					<img {...avatar.image} alt="" class="h-[inherit] rounded-full object-cover" />
-					<span {...avatar.fallback}>
-						<MdiAccount class="w-full text-center text-xl" />
+					<img {...avatar.image} alt="" class="h-full w-full rounded-full object-cover" />
+					<span
+						{...avatar.fallback}
+						class="flex h-full w-full items-center justify-center rounded-full bg-secondary text-bg"
+					>
+						<MdiAccount class="text-xl" />
 					</span>
 				</button>
 
