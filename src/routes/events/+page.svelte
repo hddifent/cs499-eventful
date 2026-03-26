@@ -14,6 +14,8 @@
 	import CardSquare from '$lib/components/CardSquare.svelte';
 	import { resolve } from '$app/paths';
 
+	import banner from '$lib/assets/bannner.png';
+
 	// Loaded data from API
 	const { data }: { data: PageData } = $props();
 
@@ -47,11 +49,7 @@
 	};
 </script>
 
-<TopCard
-	imgSrc="https://github.com/hddifent.png"
-	title="Events"
-	desc="Discover events happening right now."
-/>
+<TopCard imgSrc={banner} title="Events" desc="Discover events happening right now." />
 
 <div class="py-8">
 	<div class="mx-auto w-10/12">

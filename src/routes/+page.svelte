@@ -1,10 +1,12 @@
 <script lang="ts">
 	import TopCard from '$lib/components/TopCard.svelte';
 	import HomeBrowser from '$lib/components/HomeBrowser.svelte';
+
+	import banner from '$lib/assets/bannner.png';
 </script>
 
 <TopCard
-	imgSrc="https://github.com/hddifent.png"
+	imgSrc={banner}
 	title="Welcome to EVENTFUL"
 	desc="An all-in-one tool for event organizers and shoppers alike."
 />
