@@ -134,17 +134,33 @@
 	</div>
 {/snippet}
 
+{#snippet eventList(label: string, events: any[])}
+	<div class="text-2xl font-bold">{label} ({events.length})</div>
+	{#if events.length > 0}
+		<div class="mt-4 space-y-4">
+			{#each events as e (e.eventSlug)}
+				<CardItem
+					type="ITEM"
+					title={e.eventName}
+					subtitle="Booth {e.assignedBooth} - {e.startDate.toLocaleDateString()}"
+					clickLink={`/events/${e.eventSlug}`}
+				/>
+			{/each}
+		</div>
+	{:else}
+		None
+	{/if}
+{/snippet}
+
 {#snippet eventContent()}
 	<div class="space-y-2">
-		<div class="text-2xl font-bold">Attended (0)</div>
-		<div>None</div>
+		{@render eventList('Attended & Ongoing', data.events.attended)}
 
 		<span class="flex w-full items-center justify-center py-2">
 			<hr class="w-full border border-fg/50" />
 		</span>
 
-		<div class="text-2xl font-bold">Upcoming (0)</div>
-		<div>None</div>
+		{@render eventList('Upcoming', data.events.upcoming)}
 	</div>
 {/snippet}
 

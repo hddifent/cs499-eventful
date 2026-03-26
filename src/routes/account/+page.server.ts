@@ -14,17 +14,34 @@ interface APIOrg {
 	org_display_name: string;
 }
 
+interface APIAcceptedEvent {
+	event_name: string;
+	event_slug: string;
+	assigned_booth: string;
+	start_date: string;
+	end_date: string;
+}
+
 interface APIResponse {
 	username: string;
 	user_display_name: string;
 	pfp_url?: string;
 	user_orgs_invited: APIOrg[];
 	user_orgs_joined: APIOrg[];
+	user_accepted_events?: APIAcceptedEvent[];
 }
 
 interface Org {
 	uniqueName: string;
 	displayName: string;
+}
+
+interface EventData {
+	eventName: string;
+	eventSlug: string;
+	assignedBooth: string;
+	startDate: Date;
+	endDate: Date;
 }
 
 interface AccountReturnBody {
@@ -36,6 +53,10 @@ interface AccountReturnBody {
 	orgs: {
 		invited: Org[];
 		joined: Org[];
+	};
+	events: {
+		attended: EventData[];
+		upcoming: EventData[];
 	};
 }
 
@@ -59,6 +80,34 @@ export const load: PageServerLoad = async (event) => {
 
 	if (res.ok) {
 		const data = (await res.json()) as APIResponse;
+
+		const attended: EventData[] = [];
+		const upcoming: EventData[] = [];
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		for (const e of data.user_accepted_events || []) {
+			const startDate = new Date(e.start_date);
+			startDate.setHours(0, 0, 0, 0);
+
+			const eventObj: EventData = {
+				eventName: e.event_name,
+				eventSlug: e.event_slug,
+				assignedBooth: e.assigned_booth,
+				startDate: new Date(e.start_date),
+				endDate: new Date(e.end_date)
+			};
+
+			if (startDate > today) {
+				upcoming.push(eventObj);
+			} else {
+				attended.push(eventObj);
+			}
+		}
+
+		upcoming.sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+		attended.sort((a, b) => b.startDate.getTime() - a.startDate.getTime());
+
 		const body: AccountReturnBody = {
 			user: {
 				username: data.username,
@@ -68,6 +117,10 @@ export const load: PageServerLoad = async (event) => {
 			orgs: {
 				invited: _apiOrgToOrgList(data.user_orgs_invited),
 				joined: _apiOrgToOrgList(data.user_orgs_joined)
+			},
+			events: {
+				attended,
+				upcoming
 			}
 		};
 		return body;
