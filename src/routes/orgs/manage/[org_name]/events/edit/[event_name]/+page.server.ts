@@ -350,5 +350,26 @@ export const actions = {
 		return {
 			success: true
 		};
+	},
+
+	publishEvent: async (event) => {
+		await verifyAuth(event);
+
+		const res = await event.fetch(`/api/events/publish/${event.params.event_name}`, {
+			method: 'PATCH'
+		});
+
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			return fail(res.status, {
+				message:
+					errorData.detail || 'Failed to publish event. Please ensure all data is filled.'
+			});
+		}
+
+		return {
+			success: true,
+			message: 'Event is now public.'
+		};
 	}
 } satisfies Actions;

@@ -9,6 +9,7 @@
 	import Toaster from '$lib/components/Toaster.svelte';
 	import { addToast } from '$lib/components/Toaster.svelte';
 	import EventMapManager from '$lib/components/EventMapManager.svelte';
+	import { enhance } from '$app/forms';
 
 	const { data, form }: { data: PageServerData; form: ActionData } = $props();
 
@@ -67,13 +68,34 @@
 	<div class="space-y-4 rounded-lg bg-gray1 p-6 shadow-md">
 		<div class="flex items-center justify-between">
 			<div class="text-xl font-bold">Basic Information</div>
-			<span
-				class="rounded-full px-3 py-1 text-sm {data.general.eventStatus === 'PUBLIC'
-					? 'bg-primary'
-					: 'bg-gray2'}"
-			>
-				{data.general.eventStatus}
-			</span>
+			<div class="flex items-center space-x-2">
+				<span
+					class="rounded-full px-3 py-1 text-sm {data.general.eventStatus === 'PUBLIC'
+						? 'bg-primary'
+						: 'bg-gray2'} w-fit"
+				>
+					{data.general.eventStatus}
+				</span>
+				<form
+					method="post"
+					action="?/publishEvent"
+					use:enhance={() => {
+						return async ({ update }) => {
+							await update();
+						};
+					}}
+				>
+					<button
+						type="submit"
+						class="rounded-lg bg-primary px-4 py-2 font-bold text-bg shadow-md transition hover:bg-primary-hover disabled:opacity-50"
+						disabled={data.general.eventStatus === 'PUBLIC'}
+					>
+						{data.general.eventStatus === 'PUBLIC'
+							? 'Event Published'
+							: 'Publish Event'}
+					</button>
+				</form>
+			</div>
 		</div>
 
 		<span class="flex w-full items-center justify-center">
